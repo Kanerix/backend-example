@@ -10,3 +10,13 @@
 # Private and public keys
 /keys/*
 !/keys/.gitkeep
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform*
+terraform.rc
+crash.log
+crash.*.log
