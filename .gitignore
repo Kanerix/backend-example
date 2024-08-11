@@ -13,10 +13,22 @@
 
 # Terraform
 **/.terraform/*
+
 *.tfstate
 *.tfstate.*
+
 *.tfvars
-.terraform*
+*.tfvars.json
+
+.terraform.tfstate.lock.info
+
+.terraformrc
 terraform.rc
+
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
 crash.log
 crash.*.log
