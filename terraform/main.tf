@@ -14,6 +14,6 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-terraform"
+  name     = "lerpz-backend"
   location = "West Europe"
 }
