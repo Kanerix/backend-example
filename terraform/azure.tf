@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "app" {
 }
 
 resource "azurerm_resource_group" "deployment" {
-  name     = "${local.repository_name}-deployment-${var.ENV}"
+  name     = "${local.repository_name}-deployment"
   location = local.location
 }
 

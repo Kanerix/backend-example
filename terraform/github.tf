@@ -32,3 +32,9 @@ resource "github_actions_variable" "platform" {
   variable_name = "DEPLOYMENT_PLATFORM"
   value         = "azure"
 }
+
+resource "github_actions_secret" "azure_client_id" {
+  repository      = local.repository_name
+  secret_name     = "AZURE_CLIENT_ID"
+  plaintext_value = azurerm_user_assigned_identity.deployment-mi.client_id
+}
