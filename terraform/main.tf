@@ -10,6 +10,13 @@ terraform {
     }
   }
 
+  backend "azurerm" {
+    resource_group_name  = "lerpz-backend-tfstate"
+    storage_account_name = "tfstateevt3p"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
+
   required_version = ">= 1.9.2"
 }
 
@@ -22,8 +29,8 @@ provider "github" {
 }
 
 locals {
-  location            = "West Europe"
-  repository_name     = "lerpz-backend"
+  location        = "West Europe"
+  repository_name = "lerpz-backend"
 }
 
 variable "ENV" {
