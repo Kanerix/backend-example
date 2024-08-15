@@ -29,12 +29,6 @@ provider "github" {
 }
 
 locals {
-  location        = "West Europe"
-  repository_name = "lerpz-backend"
-}
-
-variable "ENV" {
-  description = "Deployment environment"
-  type        = string
-  default     = "staging"
+  location            = "West Europe"
+  repository_name     = "lerpz-backend"
 }

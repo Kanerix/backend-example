@@ -1,0 +1,14 @@
+name: CI/CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  wf:
+    uses: lerpz-com/github-actions/.github/workflows/rust-pipeline.yml@main
+    secrets: inherit
