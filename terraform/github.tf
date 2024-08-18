@@ -29,7 +29,7 @@ resource "github_repository_environment" "stag" {
 
 resource "github_actions_variable" "platform" {
   repository    = local.repository_name
-  variable_name = "DEPLOYMENT_PLATFORM"
+  variable_name = "DEPLOY_PLATFORM"
   value         = "azure"
 }
 
