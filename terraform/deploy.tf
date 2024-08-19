@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "app" {
-  name     = "${local.repository_name}-${var.env}"
+  name     = "${local.repository_name}-${var.deploy_env}"
   location = local.location
 }
 
