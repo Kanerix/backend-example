@@ -41,6 +41,6 @@ resource "github_actions_variable" "azure_client_id" {
 
 resource "github_actions_variable" "azure_subscription_id" {
   repository    = local.repository_name
-  variable_name = "AZURE_CLIENT_ID"
+  variable_name = "AZURE_SUBSCRIPTION_ID"
   value         = data.azurerm_subscription.current.subscription_id
 }
