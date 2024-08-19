@@ -8,7 +8,7 @@ use error::{Error, Result};
 use parts::{HashParts, PwdParts};
 use scheme::{get_scheme, Scheme};
 
-static LATEST_SCHEME: &'static str = "01";
+static LATEST_SCHEME: &str = "01";
 
 /// Hashes a password using the latest scheme.
 ///
@@ -25,13 +25,17 @@ pub async fn hash_pwd(pwd: impl Into<String>, salt: impl Into<String>) -> Result
 /// why it is unsafe to call. You can use this function together with
 /// the [`PwdParts::new`] method to create a password using the latest
 /// scheme.
+///
+/// # Safety
+///
+/// Use the [`PwdParts::new`] method to create a password using the latest
 pub async unsafe fn hash_pwd_parts(pwd_parts: PwdParts) -> Result<String> {
 	let scheme = get_scheme(&pwd_parts.scheme_name)?;
 	tokio::task::spawn_blocking(move || {
 		scheme
 			.hash(&pwd_parts.pwd, &pwd_parts.salt)
-			.and_then(|hash| Ok(format!("#{}#{}", pwd_parts.scheme_name, hash)))
-			.map_err(|err| Error::SchemeError(err))
+			.map(|hash| format!("#{}#{}", pwd_parts.scheme_name, hash))
+			.map_err(Error::SchemeError)
 	})
 	.await
 	.map_err(|_| Error::FailSpawnBlockForHash)
@@ -69,12 +73,8 @@ pub async unsafe fn validate_pwd_parts(
 	let scheme = get_scheme(&hash_parts.scheme_name)?;
 	tokio::task::spawn_blocking(move || {
 		scheme
-			.validate(
-				&hash_parts.hash,
-				&pwd_ref,
-				pwd_salt.as_ref().map(|x| x.as_str()),
-			)
-			.map_err(|err| Error::SchemeError(err))
+			.validate(&hash_parts.hash, &pwd_ref, pwd_salt.as_deref())
+			.map_err(Error::SchemeError)
 	})
 	.await
 	.map_err(|_| Error::FailSpawnBlockForValidate)

@@ -72,7 +72,7 @@ where
 	/// sets the log_id field so that the error can be tracked.
 	fn into_response(mut self) -> Response {
 		if let Some(error) = self.inner.as_ref() {
-			if let None = self.log_id {
+			if self.log_id.is_none() {
 				self.log_id = Some(uuid::Uuid::new_v4())
 			};
 
@@ -173,6 +173,10 @@ where
 	/// The `log_id` field is automatically set when the `inner` field is present and the
 	/// `log_id` is [`None`]. Changing this field might make it hard or impossible to
 	/// track the error or in other ways, break how the error is logged.
+	///
+	/// # Safety
+	///
+	/// Make sure you use a globally unique identifier for the `log_id`.
 	pub unsafe fn with_log_id<U>(&mut self, log_id: U)
 	where
 		U: Into<uuid::Uuid>,

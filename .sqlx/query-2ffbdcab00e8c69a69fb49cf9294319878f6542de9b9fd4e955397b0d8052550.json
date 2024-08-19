@@ -1,0 +1,75 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n        users.id,\n        users.email,\n        users.username,\n        users.role AS \"role: models::user::UserRole\",\n        users.created_at,\n        users.updated_at,\n        passwords.hash,\n        passwords.salt\n        FROM users\n        INNER JOIN passwords ON users.id = passwords.user_id\n        WHERE email = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "role: models::user::UserRole",
+        "type_info": {
+          "Custom": {
+            "name": "role",
+            "kind": {
+              "Enum": [
+                "user",
+                "moderator",
+                "admin"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "hash",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "salt",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "2ffbdcab00e8c69a69fb49cf9294319878f6542de9b9fd4e955397b0d8052550"
+}

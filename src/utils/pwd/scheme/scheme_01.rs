@@ -14,7 +14,7 @@ use super::{
 lazy_static! {
 	static ref ARGON2: Argon2<'static> = {
 		Argon2::new_with_secret(
-			&CONFIG.PWD_SECRET.as_bytes(),
+			CONFIG.PWD_SECRET.as_bytes(),
 			Algorithm::Argon2id,
 			Version::V0x13,
 			Params::default(),

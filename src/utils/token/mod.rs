@@ -16,7 +16,7 @@ pub fn generate_access_token(user: impl Into<TokenUser>) -> Result<String> {
 		&TokenClaims::new(user),
 		&keys::JWT_ENCODE_KEY,
 	)
-	.map_err(|err| Error::TokenError(err))
+	.map_err(Error::TokenError)
 }
 
 pub fn decode_access_token(token: &str) -> Result<TokenData<TokenClaims>> {
@@ -25,7 +25,7 @@ pub fn decode_access_token(token: &str) -> Result<TokenData<TokenClaims>> {
 		&keys::JWT_DECODE_KEY,
 		&jsonwebtoken::Validation::default(),
 	)
-	.map_err(|err| Error::TokenError(err))
+	.map_err(Error::TokenError)
 }
 
 pub fn generate_refresh_token() -> String {
