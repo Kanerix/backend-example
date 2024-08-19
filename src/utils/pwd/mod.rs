@@ -101,7 +101,7 @@ mod tests {
 			.await
 			.unwrap();
 
-		assert_eq!(pwd_wrong, false);
-		assert_eq!(pwd_correct, true);
+		assert!(!pwd_wrong);
+		assert!(pwd_correct);
 	}
 }

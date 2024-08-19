@@ -14,6 +14,12 @@ resource "azurerm_user_assigned_identity" "deployment-mi" {
   location            = azurerm_resource_group.deployment.location
 }
 
+resource "azurerm_role_assignment" "deployment-mi-owner" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Owner"
+  principal_id         = azurerm_user_assigned_identity.deployment-mi.principal_id
+}
+
 resource "azurerm_federated_identity_credential" "env_stag" {
   name                = "gh-actions-env-stag"
   resource_group_name = azurerm_resource_group.deployment.name
