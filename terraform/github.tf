@@ -33,8 +33,14 @@ resource "github_actions_variable" "platform" {
   value         = "azure"
 }
 
-resource "github_actions_secret" "azure_client_id" {
-  repository      = local.repository_name
-  secret_name     = "AZURE_CLIENT_ID"
-  plaintext_value = azurerm_user_assigned_identity.deployment-mi.client_id
+resource "github_actions_variable" "azure_client_id" {
+  repository    = local.repository_name
+  variable_name = "AZURE_CLIENT_ID"
+  value         = azurerm_user_assigned_identity.deployment-mi.client_id
+}
+
+resource "github_actions_variable" "azure_subscription_id" {
+  repository    = local.repository_name
+  variable_name = "AZURE_CLIENT_ID"
+  value         = data.azurerm_subscription.current.subscription_id
 }
