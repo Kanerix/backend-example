@@ -24,7 +24,14 @@ serde_json = "1.0"
 # -- Other
 anyhow = "1.0"
 thiserror = "1.0"
-sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls", "chrono", "migrate", "macros", "uuid"] }
+sqlx = { version = "0.7", features = [
+    "postgres",
+    "runtime-tokio-native-tls",
+    "chrono",
+    "migrate",
+    "macros",
+    "uuid",
+] }
 rand = "0.8"
 jsonwebtoken = "9.2"
 chrono = { version = "0.4", features = ["serde"] }
@@ -32,3 +39,8 @@ argon2 = "0.5"
 dotenv = "0.15"
 lazy_static = "1.4"
 regex = "1.10"
+
+
+[[bin]]
+name = "lerpz-backend"
+path = "src/main.rs"
