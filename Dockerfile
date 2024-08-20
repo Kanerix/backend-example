@@ -1,8 +1,7 @@
 FROM rust:alpine3.18 as chef
 
-RUN apk update && \
-    apk upgrade --no-cache && \
-    apk add musl-dev pkgconf openssl openssl-dev perl make curl
+RUN apk update && apk upgrade --no-cache
+RUN apk add --no-cache musl-dev pkgconf openssl libressl-dev
 
 RUN cargo install cargo-chef
 
@@ -22,13 +21,15 @@ RUN cargo chef cook --release --recipe-path recipe.json
 
 COPY . .
 
-RUN ls -la
-
 RUN mkdir keys && \
     openssl genpkey -algorithm ED25519 -outform PEM -out ./keys/ed25519_private.pem && \
     openssl pkey -in ./keys/ed25519_private.pem -pubout -out ./keys/ed25519_public.pem
 
+ENV SQLX_OFFLINE=true
+
 RUN cargo build --release
+
+RUN tree -d ./target
 
 
 FROM alpine:3.18 AS runtime
