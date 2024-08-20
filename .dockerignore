@@ -1,0 +1,16 @@
+# Git and GitHub
+.github
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose.yml
+
+# Terraform
+terraform
+
+# Development
+target
+keys
+.env.example
+.env.test
