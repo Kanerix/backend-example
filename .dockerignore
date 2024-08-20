@@ -1,4 +1,5 @@
 # Git and GitHub
+.git
 .github
 .gitignore
 
@@ -14,3 +15,6 @@ target
 keys
 .env.example
 .env.test
+
+# Other
+README.md
