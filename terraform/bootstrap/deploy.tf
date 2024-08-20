@@ -1,8 +1,3 @@
-resource "azurerm_resource_group" "app" {
-  name     = "${local.repository_name}-${var.deploy_env}"
-  location = local.location
-}
-
 resource "azurerm_resource_group" "deployment" {
   name     = "${local.repository_name}-deployment"
   location = local.location
@@ -20,7 +15,7 @@ resource "azurerm_role_assignment" "deployment-mi-owner" {
   principal_id         = azurerm_user_assigned_identity.deployment-mi.principal_id
 }
 
-resource "azurerm_federated_identity_credential" "env_stag" {
+resource "azurerm_federated_identity_credential" "env-stag" {
   name                = "gh-actions-env-stag"
   resource_group_name = azurerm_resource_group.deployment.name
   parent_id           = azurerm_user_assigned_identity.deployment-mi.id
@@ -29,7 +24,7 @@ resource "azurerm_federated_identity_credential" "env_stag" {
   subject             = "repo:lerpz-com/${local.repository_name}:environment:${github_repository_environment.stag.environment}"
 }
 
-resource "azurerm_federated_identity_credential" "env_prod" {
+resource "azurerm_federated_identity_credential" "env-prod" {
   name                = "gh-actions-env-prod"
   resource_group_name = azurerm_resource_group.deployment.name
   parent_id           = azurerm_user_assigned_identity.deployment-mi.id
