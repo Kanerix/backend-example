@@ -1,32 +1,32 @@
-FROM rust:alpine3.18 AS planner
-WORKDIR /plan
+FROM rust:alpine3.18 as chef
 
 RUN apk update && \
-	apk upgrade --no-cache && \
-	apk add musl-dev
+    apk upgrade --no-cache && \
+    apk add musl-dev pkgconf openssl openssl-dev perl make curl
 
 RUN cargo install cargo-chef
+
+
+FROM chef AS planner
+WORKDIR /plan
 
 COPY rust-toolchain.toml Cargo.toml Cargo.lock ./
 RUN cargo chef prepare --recipe-path recipe.json
 
 
-FROM rust:alpine3.18 AS builder
+FROM chef AS builder
 WORKDIR /build
-
-RUN apk update && \
-	apk upgrade --no-cache && \
-	apk add musl-dev, libressl, pkg-config
-
-RUN cargo install cargo-chef
 
 COPY --from=planner /plan/recipe.json ./recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
 COPY . .
 
-RUN openssl genpkey -algorithm ED25519 -outform PEM -out ./keys/ed25519_private.pem 
-RUN openssl pkey -in ./keys/ed25519_private.pem -pubout -out ./keys/ed25519_public.pem
+RUN ls -la
+
+RUN mkdir keys && \
+    openssl genpkey -algorithm ED25519 -outform PEM -out ./keys/ed25519_private.pem && \
+    openssl pkey -in ./keys/ed25519_private.pem -pubout -out ./keys/ed25519_public.pem
 
 RUN cargo build --release
 
@@ -37,9 +37,9 @@ WORKDIR /var/app
 COPY --from=builder /build/target/release/lerpz_backend ./
 COPY --from=builder /build/keys ./
 
-RUN addgroup -S server && \
-	adduser -S lerpz_backend -G server && \
-	chown -R lerpz_backend:server /var/www/app
+RUN addgroup -S app && \
+    adduser -S lerpz_backend -G app && \
+    chown -R lerpz_backend:server /var/app
 
 USER lerpz_backend
 
