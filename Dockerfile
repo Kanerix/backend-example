@@ -37,9 +37,9 @@ COPY --from=builder /build/target/release/backend ./
 COPY --from=builder /build/keys ./
 
 RUN addgroup -S app && \
-    adduser -S lerpz_backend -G app && \
-    chown -R lerpz_backend:server /var/app
+    adduser -S lerpz -G app && \
+    chown -R lerpz:app /var/app
 
-USER lerpz_backend
+USER lerpz
 
 ENTRYPOINT ["/var/app/backend"]
