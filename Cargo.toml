@@ -42,5 +42,5 @@ regex = "1.10"
 
 
 [[bin]]
-name = "lerpz-backend"
+name = "backend"
 path = "src/main.rs"

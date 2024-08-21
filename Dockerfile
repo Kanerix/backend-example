@@ -29,13 +29,11 @@ ENV SQLX_OFFLINE=true
 
 RUN cargo build --release
 
-RUN tree -d ./target
-
 
 FROM alpine:3.18 AS runtime
 WORKDIR /var/app
 
-COPY --from=builder /build/target/release/lerpz_backend ./
+COPY --from=builder /build/target/release/backend ./
 COPY --from=builder /build/keys ./
 
 RUN addgroup -S app && \
@@ -44,4 +42,4 @@ RUN addgroup -S app && \
 
 USER lerpz_backend
 
-ENTRYPOINT ["/var/app/lerpz_backend"]
+ENTRYPOINT ["/var/app/backend"]
