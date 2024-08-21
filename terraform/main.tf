@@ -8,5 +8,5 @@ data "github_repository" "current" {
 
 resource "azurerm_resource_group" "main" {
   name     = "${data.github_repository.current.name}-${var.deploy_env}"
-  location = "East US"
+  location = local.location
 }
