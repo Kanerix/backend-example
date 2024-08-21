@@ -27,7 +27,13 @@ resource "github_repository_environment" "stag" {
   }
 }
 
-resource "github_actions_variable" "platform" {
+resource "github_actions_variable" "project_type" {
+  repository    = local.repository_name
+  variable_name = "PROJECT_TYPE"
+  value         = "ACI"
+}
+
+resource "github_actions_variable" "deploy_platform" {
   repository    = local.repository_name
   variable_name = "DEPLOY_PLATFORM"
   value         = "azure"
