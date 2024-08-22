@@ -42,4 +42,6 @@ RUN addgroup -S app && \
 
 USER lerpz
 
+EXPOSE 443
+
 ENTRYPOINT ["/var/app/backend"]
