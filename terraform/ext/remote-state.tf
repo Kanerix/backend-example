@@ -18,19 +18,19 @@ resource "azurerm_storage_account" "tfstate" {
   allow_nested_items_to_be_public = false
 }
 
-resource "azurerm_storage_container" "tfstate-deploy" {
+resource "azurerm_storage_container" "tfstate_deploy" {
   name                  = "tfstate-deploy"
   storage_account_name  = azurerm_storage_account.tfstate.name
   container_access_type = "private"
 }
 
-resource "azurerm_storage_container" "tfstate-stag" {
+resource "azurerm_storage_container" "tfstate_stag" {
   name                  = "tfstate-stag"
   storage_account_name  = azurerm_storage_account.tfstate.name
   container_access_type = "private"
 }
 
-resource "azurerm_storage_container" "tfstate-prod" {
+resource "azurerm_storage_container" "tfstate_prod" {
   name                  = "tfstate-prod"
   storage_account_name  = azurerm_storage_account.tfstate.name
   container_access_type = "private"

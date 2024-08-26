@@ -42,7 +42,7 @@ resource "github_actions_variable" "deploy_platform" {
 resource "github_actions_variable" "azure_client_id" {
   repository    = local.repository_name
   variable_name = "AZURE_CLIENT_ID"
-  value         = azurerm_user_assigned_identity.deployment-mi.client_id
+  value         = azurerm_user_assigned_identity.deployment.client_id
 }
 
 resource "github_actions_variable" "azure_subscription_id" {

@@ -10,3 +10,9 @@ resource "azurerm_resource_group" "app" {
   name     = "${data.github_repository.primary.name}-${var.deploy_env}"
   location = local.location
 }
+
+resource "azurerm_user_assigned_identity" "identity" {
+  name                = "${local.repository_name}-identity-${var.deploy_env}"
+  resource_group_name = azurerm_resource_group.app.name
+  location            = azurerm_resource_group.app.location
+}

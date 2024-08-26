@@ -29,6 +29,6 @@ provider "github" {
 }
 
 locals {
-  location            = "West Europe"
-  repository_name     = "lerpz-backend"
+  location        = "West Europe"
+  repository_name = "lerpz-backend"
 }
