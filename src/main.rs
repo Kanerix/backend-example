@@ -16,7 +16,9 @@ use utoipa_swagger_ui::SwaggerUi;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
 	#[cfg(debug_assertions)]
-	dotenv::dotenv().unwrap();
+	if let Err(_) = dotenv::dotenv() {
+		tracing::warn!("no .env file found");
+	}
 
 	tracing_subscriber::registry()
 		.with(EnvFilter::from_default_env())
