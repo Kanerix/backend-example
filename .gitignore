@@ -32,3 +32,6 @@ override.tf.json
 
 crash.log
 crash.*.log
+
+# Mac OS
+.DS_Store
