@@ -21,7 +21,7 @@ resource "azurerm_federated_identity_credential" "env_stag" {
   parent_id           = azurerm_user_assigned_identity.deployment.id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = "https://token.actions.githubusercontent.com"
-  subject             = "repo:lerpz-com/${local.repository_name}:environment:${github_repository_environment.stag.environment}"
+  subject             = "repo:${local.github_orginization}/${local.repository_name}:environment:${github_repository_environment.stag.environment}"
 }
 
 resource "azurerm_federated_identity_credential" "env_prod" {
@@ -30,5 +30,5 @@ resource "azurerm_federated_identity_credential" "env_prod" {
   parent_id           = azurerm_user_assigned_identity.deployment.id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = "https://token.actions.githubusercontent.com"
-  subject             = "repo:lerpz-com/${local.repository_name}:environment:${github_repository_environment.prod.environment}"
+  subject             = "repo:${local.github_orginization}/${local.repository_name}:environment:${github_repository_environment.prod.environment}"
 }

@@ -14,7 +14,7 @@ resource "github_actions_environment_secret" "database_url" {
   repository      = data.github_repository.primary.name
   environment     = var.deploy_env
   secret_name     = "DATABASE_URL"
-  plaintext_value = "Filled in later"
+  plaintext_value = "postgresql://lerpz:Password1234!@${azurerm_postgresql_flexible_server.server.fqdn}:5432/primary"
 }
 
 resource "github_actions_environment_variable" "api_origin" {
