@@ -7,10 +7,13 @@ resource "azurerm_postgresql_flexible_server" "server" {
   administrator_password = var.database_password
   sku_name               = "GP_Standard_D2s_v3"
 
-  storage_mb                    = 32768
-  version                       = "12"
-  auto_grow_enabled             = false
-  backup_retention_days         = 7
+  storage_mb            = 32768
+  version               = "12"
+  auto_grow_enabled     = false
+  backup_retention_days = 7
+
+  delegated_subnet_id           = azurerm_subnet.example.id
+  private_dns_zone_id           = azurerm_private_dns_zone.example.id
   public_network_access_enabled = false
 
   identity {
