@@ -11,8 +11,8 @@ resource "azurerm_resource_group" "app" {
   location = local.location
 }
 
-resource "azurerm_user_assigned_identity" "identity" {
-  name                = "${local.repository_name}-identity-${var.deploy_env}"
+resource "azurerm_user_assigned_identity" "app" {
+  name                = "${local.repository_name}-mi"
   resource_group_name = azurerm_resource_group.app.name
   location            = azurerm_resource_group.app.location
 }

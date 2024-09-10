@@ -1,11 +1,11 @@
-resource "azurerm_postgresql_flexible_server" "server" {
+resource "azurerm_postgresql_flexible_server" "app" {
   name                = "${local.repository_name}-pgs"
   resource_group_name = azurerm_resource_group.app.name
   location            = azurerm_resource_group.app.location
 
   administrator_login    = var.database_username
   administrator_password = var.database_password
-  sku_name               = "GP_Standard_D2s_v3"
+  sku_name               = "B_Standard_B1ms"
 
   storage_mb            = 32768
   version               = "12"
@@ -20,23 +20,14 @@ resource "azurerm_postgresql_flexible_server" "server" {
     type = "UserAssigned"
 
     identity_ids = [
-      azurerm_user_assigned_identity.identity.id
+      azurerm_user_assigned_identity.app.id
     ]
   }
 
   lifecycle {
     prevent_destroy = true
-  }
-}
-
-resource "azurerm_postgresql_database" "primary" {
-  name                = "primary"
-  resource_group_name = azurerm_resource_group.app.name
-  server_name         = azurerm_postgresql_flexible_server.server.name
-  charset             = "UTF8"
-  collation           = "English_United States.1252"
-
-  lifecycle {
-    prevent_destroy = true
+    ignore_changes = [
+      zone
+    ]
   }
 }
