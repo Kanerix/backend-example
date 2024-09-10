@@ -12,8 +12,8 @@ resource "azurerm_postgresql_flexible_server" "server" {
   auto_grow_enabled     = false
   backup_retention_days = 7
 
-  delegated_subnet_id           = azurerm_subnet.example.id
-  private_dns_zone_id           = azurerm_private_dns_zone.example.id
+  delegated_subnet_id           = azurerm_subnet.app.id
+  private_dns_zone_id           = azurerm_private_dns_zone.app.id
   public_network_access_enabled = false
 
   identity {
