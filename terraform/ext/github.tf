@@ -1,6 +1,11 @@
 resource "github_repository" "repo" {
-  name          = local.repository_name
-  visibility    = "public"
+  name        = local.repository_name
+  description = "An API created using Axum"
+  visibility  = "public"
+
+  vulnerability_alerts = true
+
+  has_projects  = true
   has_downloads = true
   has_issues    = true
 }
@@ -30,7 +35,7 @@ resource "github_repository_environment" "stag" {
 resource "github_actions_variable" "project_type" {
   repository    = local.repository_name
   variable_name = "PROJECT_TYPE"
-  value         = "ACI"
+  value         = "terraform"
 }
 
 resource "github_actions_variable" "deploy_platform" {
