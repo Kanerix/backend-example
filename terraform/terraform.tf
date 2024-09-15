@@ -1,4 +1,3 @@
-
 terraform {
   required_providers {
     azurerm = {
@@ -29,7 +28,7 @@ provider "github" {
 }
 
 locals {
-  github_orginization = "lerpz-com"
   location            = "West Europe"
+  github_orginization = "lerpz-com"
   repository_name     = "lerpz-backend"
 }
