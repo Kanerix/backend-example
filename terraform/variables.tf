@@ -4,14 +4,20 @@ variable "deploy_env" {
   default     = "stag"
 }
 
-variable "database_username" {
-  description = "The username for the Postgres database."
+variable "registry_password" {
+  description = "Access token for ghcr.io"
   type        = string
   sensitive   = true
 }
 
 variable "database_password" {
-  description = "The password for the Postgres database."
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
+
+variable "database_username" {
+  description = "Database username"
   type        = string
   sensitive   = true
 }
