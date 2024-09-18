@@ -16,3 +16,8 @@ resource "azurerm_user_assigned_identity" "app" {
   resource_group_name = azurerm_resource_group.app.name
   location            = azurerm_resource_group.app.location
 }
+
+resource "random_string" "pwd_secret" {
+  length  = 32
+  special = true
+}
