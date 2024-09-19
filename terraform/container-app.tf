@@ -4,9 +4,22 @@ resource "azurerm_container_app" "app" {
   container_app_environment_id = azurerm_container_app_environment.app.id
   revision_mode                = "Single"
 
+  registry {
+    server               = "ghcr.io"
+    username             = "Kanerix"
+    password_secret_name = "github-token"
+  }
+
+  identity {
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.app.id,
+    ]
+  }
+
   secret {
     name  = "database-url"
-    value = "postgresql://${var.database_username}:${var.database_password}@${data.azurerm_postgresql_flexible_server.primary.fqdn}/${local.repository_name}-${var.deploy_env}"
+    value = "postgres://${var.database_username}:${var.database_password}@${data.azurerm_postgresql_flexible_server.primary.fqdn}/${azurerm_postgresql_flexible_server_database.app.name}"
   }
 
   secret {
@@ -20,11 +33,23 @@ resource "azurerm_container_app" "app" {
   }
 
   template {
+    max_replicas = 1
+
+    volume {
+      name         = "app-keys"
+      storage_type = "Secret"
+    }
+
     container {
       name   = "${local.repository_name}-${var.deploy_env}"
       image  = "ghcr.io/lerpz-com/${local.repository_name}:${var.deploy_env}"
       cpu    = 0.25
       memory = "0.5Gi"
+
+      volume_mounts {
+        name = "app-keys"
+        path = "/app/var/keys"
+      }
 
       env {
         name  = "ENV"
@@ -52,12 +77,6 @@ resource "azurerm_container_app" "app" {
       }
     }
   }
-
-  registry {
-    server               = "ghcr.io"
-    username             = "Kanerix"
-    password_secret_name = "github-token"
-  }
 }
 
 resource "azurerm_container_app_environment" "app" {
@@ -65,4 +84,5 @@ resource "azurerm_container_app_environment" "app" {
   location                   = azurerm_resource_group.app.location
   resource_group_name        = azurerm_resource_group.app.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.app.id
+  infrastructure_subnet_id   = azurerm_subnet.app.id
 }
