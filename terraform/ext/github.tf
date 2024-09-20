@@ -1,4 +1,4 @@
-resource "github_repository" "repo" {
+resource "github_repository" "primary" {
   name        = local.repository_name
   description = "An API created using Axum"
   visibility  = "public"
@@ -12,7 +12,7 @@ resource "github_repository" "repo" {
 
 resource "github_repository_environment" "prod" {
   environment         = "prod"
-  repository          = github_repository.repo.name
+  repository          = github_repository.primary.name
   prevent_self_review = true
 
   deployment_branch_policy {
@@ -23,7 +23,7 @@ resource "github_repository_environment" "prod" {
 
 resource "github_repository_environment" "stag" {
   environment         = "stag"
-  repository          = github_repository.repo.name
+  repository          = github_repository.primary.name
   prevent_self_review = true
 
   deployment_branch_policy {
@@ -47,7 +47,7 @@ resource "github_actions_variable" "deploy_platform" {
 resource "github_actions_variable" "azure_client_id" {
   repository    = local.repository_name
   variable_name = "AZURE_CLIENT_ID"
-  value         = azurerm_user_assigned_identity.deployment.client_id
+  value         = azurerm_user_assigned_identity.deploy.client_id
 }
 
 resource "github_actions_variable" "azure_subscription_id" {
