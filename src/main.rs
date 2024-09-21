@@ -25,10 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.with(tracing_subscriber::fmt::layer())
 		.init();
 
-	#[cfg(debug_assertions)]
 	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
-	#[cfg(not(debug_assertions))]
-	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 443));
 
 	let listener = tokio::net::TcpListener::bind(addr).await?;
 
