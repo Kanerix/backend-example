@@ -32,6 +32,16 @@ resource "azurerm_container_app" "app" {
     value = var.registry_password
   }
 
+  ingress {
+    target_port      = 8080
+    external_enabled = true
+
+    traffic_weight {
+      latest_revision = true
+      percentage      = 100
+    }
+  }
+
   template {
     max_replicas = 1
 
