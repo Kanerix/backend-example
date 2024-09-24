@@ -34,7 +34,8 @@ FROM alpine:3.18 AS runtime
 WORKDIR /var/app
 
 COPY --from=builder /build/target/release/backend ./
-COPY --from=builder /build/keys ./
+COPY --from=builder /build/keys ./keys
+COPY --from=builder /build/migrations ./migrations
 
 RUN addgroup -S app && \
     adduser -S lerpz -G app && \
