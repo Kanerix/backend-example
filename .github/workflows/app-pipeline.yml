@@ -1,7 +1,17 @@
 name: Project pipeline to deploy rust projects using containers
 
 on:
-  workflow_call:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'src/**'
+      - 'terraform/**'
+      - 'migrations/**'
+      - 'Dockerfile'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
 
 jobs:
   prepare-pipeline:
