@@ -11,7 +11,7 @@ use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info_span;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
+use utoipa_swagger_ui::{SwaggerUi, Url};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -35,10 +35,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 	sqlx::migrate!();
 
 	let app = Router::new()
-		.merge(
-			SwaggerUi::new("/swagger-ui")
-				.url("/api-docs/openapi.json", routes::v1::ApiDoc::openapi()),
-		)
+		.merge(SwaggerUi::new("/swagger-ui").urls(vec![(
+			Url::with_primary("v1", "/api-docs/openapi_v1.json", true),
+			routes::v1::ApiDoc::openapi(),
+		)]))
 		.nest("/api/v1", routes::v1::routes())
 		.with_state(pool)
 		.layer(
