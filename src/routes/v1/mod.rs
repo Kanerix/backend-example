@@ -28,7 +28,7 @@ pub fn routes() -> Router<PgPool> {
     )),
     tags(
         (name = "Auth", description = "Endpoints for handling user authentication."),
-        (name = "Health", description = "Endpoints checking application health."),
+        (name = "Health", description = "Endpoints for checking application health."),
     )
 )]
 pub struct ApiDoc;
