@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::str::FromStr;
 
-use super::{error::Error, LATEST_SCHEME};
+use super::{error::Error, DEFAULT_SCHEME};
 
 /// What parts a password needs to be hashed.
 ///
@@ -28,7 +28,7 @@ impl PwdParts {
 	/// This will have the latest scheme for hashing.
 	pub fn new(pwd: String, salt: String) -> Self {
 		Self {
-			scheme_name: LATEST_SCHEME.into(),
+			scheme_name: DEFAULT_SCHEME.into(),
 			salt,
 			pwd,
 		}

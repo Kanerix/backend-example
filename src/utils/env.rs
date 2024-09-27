@@ -12,7 +12,7 @@ pub enum Error {
 	ParseError(String, String),
 }
 
-/// Get an environment variable.
+/// Gets an environment variable.
 ///
 /// Returns an error if the variable is not found.
 pub fn get_env<K>(key: K) -> Result<String>
@@ -22,7 +22,7 @@ where
 	std::env::var(key).map_err(|_| Error::NotFound(key.as_ref().to_string_lossy().to_string()))
 }
 
-/// Get an environment variable and tries to parse it into the generic type `T`.
+/// Gets an environment variable and tries to parse it into the generic type `T`.
 ///
 /// Returns an error if the variable is not found or if the parsing fails.
 pub fn get_env_parse<K, T>(key: K) -> Result<T>
