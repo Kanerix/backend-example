@@ -25,10 +25,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.with(tracing_subscriber::fmt::layer())
 		.init();
 
-	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
-
-	let listener = tokio::net::TcpListener::bind(addr).await?;
-
 	let pool = PgPoolOptions::new()
 		.max_connections(5)
 		.acquire_timeout(Duration::from_secs(3))
@@ -64,8 +60,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 				)
 			}),
 		);
-	// .layer(ServiceBuilder::new().layer(from_extractor::<AuthUser>()));
 
+	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
+	let listener = tokio::net::TcpListener::bind(addr).await?;
 	axum::serve(listener, app.into_make_service())
 		.with_graceful_shutdown(shutdown_signal())
 		.await?;
