@@ -140,8 +140,10 @@ where
 		}
 	}
 
-	/// A generic response for someone that tries to access an authorized resource
-	/// without proper authorization.
+	/// An generic unauthorized response.
+	///
+	/// This is a generic response for someone that tries to access an
+	/// authorized resource without proper authorization.
 	pub fn unauthorized() -> Self {
 		Self::new(
 			StatusCode::UNAUTHORIZED,
