@@ -66,6 +66,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
 	let listener = tokio::net::TcpListener::bind(addr).await?;
+	tracing::info!("server started listening on {addr}");
+
 	axum::serve(listener, app.into_make_service())
 		.with_graceful_shutdown(shutdown_signal())
 		.await?;
