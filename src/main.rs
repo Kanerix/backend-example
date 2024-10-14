@@ -32,7 +32,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.await
 		.expect("can't connect to database");
 
-	sqlx::migrate!();
+	sqlx::migrate!()
+		.run(&pool)
+		.await
+		.expect("migrations failed against database");
 
 	let app = Router::new()
 		.merge(SwaggerUi::new("/swagger-ui").urls(vec![(
