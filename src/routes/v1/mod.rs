@@ -17,8 +17,8 @@ pub fn routes() -> Router<PgPool> {
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        Auth::login,
-        Auth::register,
+        Auth::login::login,
+        Auth::register::register,
         Health::health,
     ),
     components(schemas(
