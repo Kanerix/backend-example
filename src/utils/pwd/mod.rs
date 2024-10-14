@@ -1,5 +1,8 @@
+/// Errors that can occur when working with passwords.
 pub mod error;
+/// Parts needed for hashing and validating passwords.
 pub mod parts;
+/// Schemas for hashing and validating passwords.
 pub mod scheme;
 
 use std::str::FromStr;
@@ -8,7 +11,8 @@ use error::{Error, Result};
 use parts::{HashParts, PwdParts};
 use scheme::{get_scheme, Scheme};
 
-static LATEST_SCHEME: &str = "01";
+/// The default scheme used for hashing passwords.
+static DEFAULT_SCHEME: &str = "01";
 
 /// Hashes a password using the latest scheme.
 ///
@@ -87,7 +91,7 @@ mod tests {
 
 	#[tokio::test]
 	async fn test_password_hashing_and_validate() {
-		dotenv::from_filename(".env.test").unwrap();
+		dotenvy::from_filename(".env.test").unwrap();
 
 		let salt = uuid::Uuid::new_v4().to_string();
 		let hash = hash_pwd("password".to_string(), salt.clone())

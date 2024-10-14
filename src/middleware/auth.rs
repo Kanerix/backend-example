@@ -6,11 +6,11 @@ use axum::{
 
 use crate::{
 	error::HandlerError,
-	utils::token::{self, claims::TokenUser, decode_access_token},
+	utils::token::{claims::TokenUser, decode_access_token},
 };
 
 #[derive(Debug, Clone)]
-pub struct AuthUser(pub Option<TokenUser>);
+pub struct AuthUser(pub TokenUser);
 
 #[async_trait]
 impl<S> FromRequestParts<S> for AuthUser
@@ -31,10 +31,8 @@ where
 			.last()
 			.ok_or(HandlerError::unauthorized())?;
 
-		let token_data = decode_access_token(token).map_err(|err| match err {
-			token::error::Error::TokenError(err) => HandlerError::from(err),
-		})?;
+		let token_data = decode_access_token(token).map_err(HandlerError::from)?;
 
-		Ok(AuthUser(Some(token_data.claims.user)))
+		Ok(AuthUser(token_data.claims.user))
 	}
 }

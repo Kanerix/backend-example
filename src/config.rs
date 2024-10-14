@@ -5,9 +5,6 @@ use crate::utils::env::{self, get_env, get_env_parse};
 
 lazy_static! {
 	/// Global configuration for the application.
-	///
-	/// This is loaded from environment variables and will
-	/// panic if any of the required variables are missing.
 	pub static ref CONFIG: Config =
 		Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {}", err));
 }

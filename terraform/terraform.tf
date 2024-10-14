@@ -1,4 +1,3 @@
-
 terraform {
   required_providers {
     azurerm = {
@@ -12,8 +11,8 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = "lerpz-backend-tfstate"
-    storage_account_name = "tfstatev0wol"
+    resource_group_name  = "lerpz-backend-ext"
+    storage_account_name = "tfstatekvbja"
     key                  = "terraform.tfstate"
   }
 
@@ -30,5 +29,6 @@ provider "github" {
 
 locals {
   location            = "West Europe"
+  github_orginization = "lerpz-com"
   repository_name     = "lerpz-backend"
 }

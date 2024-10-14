@@ -1,8 +1,10 @@
+/// This module contains the password hashing and validation schemes.
+pub mod error;
+/// Password scheme that uses argon2 for hashing and validating passwords.
+pub mod scheme_01;
+
 use error::{Error, Result};
 use scheme_01::Scheme01;
-
-pub mod error;
-pub mod scheme_01;
 
 /// Implemented by schemes that can hash and validate passwords.
 pub trait Scheme {

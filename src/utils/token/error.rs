@@ -6,6 +6,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// All the different errors the `pwd` module might produce.
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-	#[error("jwt error: {0}")]
+	#[error(transparent)]
 	TokenError(#[from] jsonwebtoken::errors::Error),
 }

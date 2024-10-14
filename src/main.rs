@@ -11,20 +11,19 @@ use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info_span;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
+use utoipa_swagger_ui::{SwaggerUi, Url};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
 	#[cfg(debug_assertions)]
-	dotenv::dotenv().unwrap();
+	if dotenvy::dotenv().is_err() {
+		tracing::warn!("no .env file found");
+	}
 
 	tracing_subscriber::registry()
 		.with(EnvFilter::from_default_env())
 		.with(tracing_subscriber::fmt::layer())
 		.init();
-
-	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
-	let listener = tokio::net::TcpListener::bind(addr).await?;
 
 	let pool = PgPoolOptions::new()
 		.max_connections(5)
@@ -33,13 +32,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.await
 		.expect("can't connect to database");
 
-	sqlx::migrate!();
+	sqlx::migrate!()
+		.run(&pool)
+		.await
+		.expect("migrations failed against database");
 
 	let app = Router::new()
-		.merge(
-			SwaggerUi::new("/swagger-ui")
-				.url("/api-docs/openapi.json", routes::v1::ApiDoc::openapi()),
-		)
+		.merge(SwaggerUi::new("/swagger-ui").urls(vec![(
+			Url::with_primary("v1", "/api-docs/openapi_v1.json", true),
+			routes::v1::ApiDoc::openapi(),
+		)]))
 		.nest("/api/v1", routes::v1::routes())
 		.with_state(pool)
 		.layer(
@@ -61,8 +63,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 				)
 			}),
 		);
-	// .layer(ServiceBuilder::new().layer(from_extractor::<AuthUser>()));
 
+	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
+	let listener = tokio::net::TcpListener::bind(addr).await?;
 	axum::serve(listener, app.into_make_service())
 		.with_graceful_shutdown(shutdown_signal())
 		.await?;

@@ -11,9 +11,9 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = "lerpz-backend-tfstate"
-    storage_account_name = "tfstatev0wol"
-    container_name       = "tfstate-deploy"
+    resource_group_name  = "lerpz-backend-ext"
+    storage_account_name = "tfstatekvbja"
+    container_name       = "tfstate-ext"
     key                  = "terraform.tfstate"
   }
 
@@ -29,6 +29,7 @@ provider "github" {
 }
 
 locals {
+  github_orginization = "lerpz-com"
   location            = "West Europe"
   repository_name     = "lerpz-backend"
 }

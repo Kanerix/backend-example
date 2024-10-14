@@ -1,12 +1,17 @@
 pub mod auth;
+pub mod health;
 
 use auth as Auth;
-use axum::Router;
+use health as Health;
+
+use axum::{routing::get, Router};
 use sqlx::PgPool;
 use utoipa::OpenApi;
 
 pub fn routes() -> Router<PgPool> {
-	Router::new().nest("/auth", Auth::routes())
+	Router::new()
+		.route("/health", get(Health::health))
+		.nest("/auth", Auth::routes())
 }
 
 #[derive(OpenApi)]
@@ -14,6 +19,7 @@ pub fn routes() -> Router<PgPool> {
     paths(
         Auth::login,
         Auth::register,
+        Health::health,
     ),
     components(schemas(
         Auth::LoginRequest,
@@ -21,7 +27,8 @@ pub fn routes() -> Router<PgPool> {
         Auth::RegisterRequest,
     )),
     tags(
-        (name = "Auth", description = "The authentication API"),
+        (name = "Auth", description = "Endpoints for handling user authentication."),
+        (name = "Health", description = "Endpoints for checking application health."),
     )
 )]
 pub struct ApiDoc;

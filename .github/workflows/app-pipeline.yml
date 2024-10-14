@@ -1,0 +1,41 @@
+name: Project pipeline to deploy rust projects using containers
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'src/**'
+      - 'terraform/**'
+      - 'migrations/**'
+      - 'Dockerfile'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+
+jobs:
+  prepare-pipeline:
+    uses: lerpz-com/github-actions/.github/workflows/prepare-pipeline.yml@v1
+    secrets: inherit
+
+  rust-lint:
+    uses: lerpz-com/github-actions/.github/workflows/rust-lint-and-test.yml@v1
+    needs: [prepare-pipeline]
+    secrets: inherit
+    with:
+      deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
+
+  build-and-push-image:
+    uses: lerpz-com/github-actions/.github/workflows/docker-build-and-push.yml@v1
+    needs: [prepare-pipeline, rust-lint]
+    secrets: inherit
+    with:
+      deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
+      image_name: ${{ needs.prepare-pipeline.outputs.image_name }}
+
+  # terraform:
+  #   uses: lerpz-com/github-actions/.github/workflows/terraform.yml@v1
+  #   needs: [prepare-pipeline, build-and-push-image]
+  #   secrets: inherit
+  #   with:
+  #     deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
