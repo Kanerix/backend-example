@@ -198,7 +198,7 @@ mod test {
 
 	#[derive(thiserror::Error, Debug)]
 	enum Error {
-		#[error("This is a test error.")]
+		#[error("this is a test error")]
 		RandomError,
 	}
 

@@ -27,22 +27,18 @@ pub struct Scheme01;
 
 impl Scheme for Scheme01 {
 	fn hash(&self, pwd: &str, salt: &str) -> Result<String> {
-		let salt = SaltString::encode_b64(salt.as_bytes()).map_err(|_| Error::PwdSalt)?;
+		let salt = SaltString::encode_b64(salt.as_bytes()).map_err(|err| Error::PwdHash(err))?;
 
 		let pwd = ARGON2
 			.hash_password(pwd.as_bytes(), &salt)
-			.map_err(|_| Error::PwdHash)?
+			.map_err(|err| Error::PwdHash(err))?
 			.to_string();
 
 		Ok(pwd)
 	}
 
 	fn validate(&self, pwd_hash: &str, pwd_ref: &str, _: Option<&str>) -> Result<bool> {
-		let pwd_hash_parsed = PasswordHash::new(pwd_hash)
-			.inspect_err(|err| {
-				println!("{err}");
-			})
-			.map_err(|_| Error::PwdHash)?;
+		let pwd_hash_parsed = PasswordHash::new(pwd_hash).map_err(|err| Error::PwdHash(err))?;
 
 		let pwd_ref_bytes = pwd_ref.as_bytes();
 
