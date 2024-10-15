@@ -8,7 +8,10 @@ use uuid::Uuid;
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
-	utils::{pwd::validate_pwd, token::generate_access_token},
+	utils::{
+		pwd::validate_pwd,
+		token::{claims::TokenUser, generate_access_token},
+	},
 };
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
@@ -21,6 +24,28 @@ pub struct LoginRequest {
 pub struct LoginResponse {
 	kind: String,
 	token: String,
+}
+
+pub struct UserWithPassword {
+	pub id: Uuid,
+	pub username: String,
+	pub email: String,
+	pub role: models::user::UserRole,
+	pub hash: String,
+	pub salt: Option<String>,
+	pub created_at: DateTime<Utc>,
+	pub updated_at: DateTime<Utc>,
+}
+
+impl From<UserWithPassword> for TokenUser {
+	fn from(user: UserWithPassword) -> TokenUser {
+		TokenUser {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			role: user.role,
+		}
+	}
 }
 
 #[utoipa::path(
@@ -39,17 +64,6 @@ pub async fn login(
 	State(pool): State<PgPool>,
 	Json(payload): Json<LoginRequest>,
 ) -> HandlerResult<Json<LoginResponse>> {
-	pub struct UserWithPassword {
-		pub id: Uuid,
-		pub username: String,
-		pub email: String,
-		pub role: models::user::UserRole,
-		pub hash: String,
-		pub salt: Option<String>,
-		pub created_at: DateTime<Utc>,
-		pub updated_at: DateTime<Utc>,
-	}
-
 	let user = sqlx::query_as!(
 		UserWithPassword,
 		"SELECT
@@ -88,18 +102,9 @@ pub async fn login(
 		_ => HandlerError::from(err),
 	})?;
 
-	if !validate_pwd(user.hash, payload.password, user.salt).await? {
+	if !validate_pwd(&user.hash, &payload.password, user.salt.as_deref()).await? {
 		return Err(HandlerError::unauthorized());
 	}
-
-	let user = models::user::User {
-		id: user.id,
-		username: user.username,
-		email: user.email,
-		role: user.role,
-		created_at: user.created_at,
-		updated_at: user.updated_at,
-	};
 
 	let token = generate_access_token(user)?;
 
