@@ -1078,6 +1078,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "utoipa",
+ "utoipa-axum",
  "utoipa-swagger-ui",
  "uuid",
 ]
@@ -2668,6 +2669,19 @@ dependencies = [
  "serde",
  "serde_json",
  "utoipa-gen",
+]
+
+[[package]]
+name = "utoipa-axum"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06e6cee799402b054e6cb75294d86a4ccdd1227bb4ce87e2a732a68f2aa9f934"
+dependencies = [
+ "axum",
+ "paste",
+ "tower-layer",
+ "tower-service",
+ "utoipa",
 ]
 
 [[package]]
