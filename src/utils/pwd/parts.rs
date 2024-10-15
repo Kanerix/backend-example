@@ -16,7 +16,7 @@ pub struct PwdParts {
 /// What passwords get turned into when hashed.
 ///
 /// This is needed for validating a password hash.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HashParts {
 	pub scheme_name: String,
 	pub hash: String,

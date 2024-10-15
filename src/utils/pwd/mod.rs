@@ -51,11 +51,15 @@ pub async unsafe fn hash_pwd_parts(pwd_parts: PwdParts) -> Result<String> {
 /// The hash needs to be parseable to [`HashParts`]. See [`HashParts::from_str`] to see
 /// how the format works.
 pub async fn validate_pwd(
-	pwd_hash: String,
-	pwd_ref: String,
-	pwd_salt: Option<String>,
+	pwd_hash: &str,
+	pwd_ref: impl Into<String>,
+	pwd_salt: Option<impl Into<String>>,
 ) -> Result<bool> {
-	unsafe { validate_pwd_parts(HashParts::from_str(&pwd_hash)?, pwd_ref, pwd_salt).await }
+	let pwd_hash = HashParts::from_str(pwd_hash)?;
+
+	let pwd_ref = pwd_ref.into();
+	let pwd_salt = pwd_salt.map(|v| v.into());
+	unsafe { validate_pwd_parts(pwd_hash, pwd_ref, pwd_salt).await }
 }
 
 /// Validates a password using [`HashParts`] and a password reference with a optional salt.
@@ -70,10 +74,14 @@ pub async fn validate_pwd(
 /// Make sure you use [`HashParts::from_str`] to get the scheme or be certain that the scheme given is
 /// the same as what was used to create the password hash.
 pub async unsafe fn validate_pwd_parts(
-	hash_parts: HashParts,
-	pwd_ref: String,
-	pwd_salt: Option<String>,
+	hash_parts: impl Into<HashParts>,
+	pwd_ref: impl Into<String>,
+	pwd_salt: Option<impl Into<String>>,
 ) -> Result<bool> {
+	let hash_parts = hash_parts.into();
+	let pwd_ref = pwd_ref.into();
+	let pwd_salt = pwd_salt.map(|v| v.into());
+
 	let scheme = get_scheme(&hash_parts.scheme_name)?;
 	tokio::task::spawn_blocking(move || {
 		scheme
@@ -98,14 +106,7 @@ mod tests {
 			.await
 			.unwrap();
 
-		let pwd_wrong = validate_pwd(hash.clone(), "not_password".to_string(), Some(salt.clone()))
-			.await
-			.unwrap();
-		let pwd_correct = validate_pwd(hash.clone(), "password".to_string(), Some(salt.clone()))
-			.await
-			.unwrap();
-
-		assert!(!pwd_wrong);
-		assert!(pwd_correct);
+		assert!(!validate_pwd(&hash, "drowssap", Some(&salt)).await.unwrap());
+		assert!(validate_pwd(&hash, "password", Some(&salt)).await.unwrap());
 	}
 }
