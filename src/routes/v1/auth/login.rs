@@ -1,4 +1,5 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{extract::State, response::IntoResponse, Json};
+use axum_extra::extract::{cookie::Cookie, CookieJar};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -10,7 +11,7 @@ use crate::{
 	models,
 	utils::{
 		pwd::validate_pwd,
-		token::{claims::TokenUser, generate_access_token},
+		token::{claims::TokenUser, generate_access_token, generate_refresh_token},
 	},
 };
 
@@ -37,13 +38,13 @@ pub struct UserWithPassword {
 	pub updated_at: DateTime<Utc>,
 }
 
-impl From<UserWithPassword> for TokenUser {
-	fn from(user: UserWithPassword) -> TokenUser {
+impl From<&UserWithPassword> for TokenUser {
+	fn from(user: &UserWithPassword) -> TokenUser {
 		TokenUser {
 			id: user.id,
-			username: user.username,
-			email: user.email,
-			role: user.role,
+			username: user.username.clone(),
+			email: user.email.clone(),
+			role: user.role.clone(),
 		}
 	}
 }
@@ -63,42 +64,27 @@ impl From<UserWithPassword> for TokenUser {
 pub async fn login(
 	State(pool): State<PgPool>,
 	Json(payload): Json<LoginRequest>,
-) -> HandlerResult<Json<LoginResponse>> {
+) -> HandlerResult<impl IntoResponse> {
 	let user = sqlx::query_as!(
 		UserWithPassword,
 		"SELECT
-        users.id,
-        users.email,
-        users.username,
-        users.role AS \"role: models::user::UserRole\",
-        users.created_at,
-        users.updated_at,
-        passwords.hash,
-        passwords.salt
-        FROM users
-        INNER JOIN passwords ON users.id = passwords.user_id
+        u.id,
+        u.email,
+        u.username,
+        u.role AS \"role: models::user::UserRole\",
+        u.created_at,
+        u.updated_at,
+        p.hash,
+        p.salt
+        FROM users u
+        INNER JOIN passwords p ON u.id = p.user_id
         WHERE email = $1",
 		&payload.username,
 	)
 	.fetch_one(&pool)
 	.await
 	.map_err(|err| match err {
-		sqlx::Error::RowNotFound => HandlerError::new(
-			StatusCode::NOT_FOUND,
-			"User not found",
-			format!(
-				"No user with the username \"{}\" was found",
-				payload.username
-			),
-		),
-		sqlx::Error::Database(db_err) => match db_err.kind() {
-			sqlx::error::ErrorKind::UniqueViolation => HandlerError::new(
-				StatusCode::CONFLICT,
-				"Unique violation",
-				"Email or username already exsits",
-			),
-			_ => HandlerError::from(db_err),
-		},
+		sqlx::Error::RowNotFound => HandlerError::unauthorized(),
 		_ => HandlerError::from(err),
 	})?;
 
@@ -106,10 +92,27 @@ pub async fn login(
 		return Err(HandlerError::unauthorized());
 	}
 
-	let token = generate_access_token(user)?;
+	let refresh_token = generate_refresh_token();
+	let access_token = generate_access_token(&user)?;
 
-	Ok(Json(LoginResponse {
-		kind: "Bearer".into(),
-		token,
-	}))
+	sqlx::query!(
+		"INSERT INTO refresh_tokens ( user_id, token ) VALUES ($1, $2)",
+		&user.id,
+		refresh_token
+	)
+	.execute(&pool)
+	.await?;
+
+	let refresh_cookie = Cookie::build(("refresh_token", refresh_token))
+		.path("/")
+		.secure(true)
+		.http_only(true);
+
+	Ok((
+		CookieJar::new().add(refresh_cookie),
+		Json(LoginResponse {
+			kind: "Bearer".into(),
+			token: access_token,
+		}),
+	))
 }

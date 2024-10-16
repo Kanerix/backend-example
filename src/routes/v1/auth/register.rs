@@ -1,4 +1,4 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use utoipa::{IntoParams, ToSchema};
@@ -32,7 +32,7 @@ pub struct RegisterRequest {
 pub async fn register(
 	State(pool): State<PgPool>,
 	Json(payload): Json<RegisterRequest>,
-) -> HandlerResult<()> {
+) -> HandlerResult<impl IntoResponse> {
 	let salt = Uuid::new_v4().to_string();
 	let password = payload.password;
 	let hash = hash_pwd(&password, &salt).await?;
