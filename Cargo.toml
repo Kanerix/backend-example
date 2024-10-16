@@ -43,6 +43,10 @@ lazy_static = "1.4"
 regex = "1.10"
 
 
+[build]
+rustflags = ["-Z", "threads=8"]
+
+
 [[bin]]
 name = "backend"
 path = "src/main.rs"
