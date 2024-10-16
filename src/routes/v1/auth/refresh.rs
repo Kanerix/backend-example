@@ -11,26 +11,28 @@ use crate::{
 };
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-struct RefreshResponse {
+pub struct RefreshResponse {
 	kind: String,
 	token: String,
 }
 
 #[utoipa::path(
 	post,
-	path = "/api/v1/auth/login",
+	path = "/api/v1/auth/refresh",
 	request_body(
 		description = "Refresh your access token using a refresh token",
 		content_type = "application/json"
 	),
-	responses()
+	responses(
+        (status = 200, description = "Successful refresh", body = RefreshResponse),
+    )
 )]
 pub async fn refresh(
 	State(pool): State<PgPool>,
 	jar: CookieJar,
 ) -> HandlerResult<impl IntoResponse> {
 	let refresh_cookie = jar
-		.get("refresh_cookie")
+		.get("refresh_token")
 		.ok_or(HandlerError::unauthorized())?;
 	let refresh_token = refresh_cookie.value();
 
@@ -57,8 +59,8 @@ pub async fn refresh(
 
 	let access_token = generate_access_token(user)?;
 
-	Ok((Json(RefreshResponse {
+	Ok(Json(RefreshResponse {
 		kind: "Bearer".into(),
 		token: access_token,
-	}),))
+	}))
 }

@@ -19,12 +19,14 @@ pub fn routes() -> Router<PgPool> {
     paths(
         Auth::login::login,
         Auth::register::register,
+        Auth::refresh::refresh,
         Health::health,
     ),
     components(schemas(
         Auth::LoginRequest,
         Auth::LoginResponse,
         Auth::RegisterRequest,
+        Auth::RefreshResponse,
     )),
     tags(
         (name = "Auth", description = "Endpoints for handling user authentication."),
