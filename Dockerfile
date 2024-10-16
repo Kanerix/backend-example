@@ -1,4 +1,4 @@
-FROM rust:alpine3.18 as chef
+FROM rust:alpine3.18 AS chef
 
 RUN apk update && apk upgrade --no-cache
 RUN apk add --no-cache musl-dev pkgconf openssl libressl-dev
