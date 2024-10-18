@@ -3,12 +3,12 @@
 ## Information
 
 The purpose of this project is to learn and document how the diffrent parts
-of the software design work. This is not meant to be used as a library as it
-is simply just for leaning and documentation purposes.
+of creating an API for production work. This is not meant to be used as a library
+as it is simply just for learning and documentation purposes.
 
-This is a simple REST API that is built using the Axum framework. This levrages
-the Tokio runtime for asyncronous operations and the SQLx crate for database related
-operations.
+This is a simple REST API that is built using the [Axum](https://crates.io/crates/axum)
+framework. This levrages the [Tokio](https://crates.io/crates/tokio) runtime for asyncronous
+operations and the [SQLx](https://crates.io/crates/sqlx) crate for database related operations.
 
 The long term goal of this project is to make it available as a public API
 for me to use for my own projects. This will be stuff like websites and other
@@ -38,5 +38,5 @@ docker run lerpz-backend -p 3000:3000
 - Optional: bind the `keys` directory to persist keys used for JWT.
 
 ```bash
-docker run lerpz-backend -v keys-docker:/app/var/keys:ro -p 3000:3000
+docker run lerpz-backend -v ./keys:/app/var/keys:ro -p 3000:3000
 ```
