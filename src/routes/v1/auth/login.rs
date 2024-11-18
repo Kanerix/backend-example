@@ -9,6 +9,7 @@ use uuid::Uuid;
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
+	routes::v1::AUTH_TAG,
 	utils::{
 		pwd::validate_pwd,
 		token::{claims::TokenUser, generate_access_token, generate_refresh_token},
@@ -60,6 +61,7 @@ impl From<&UserWithPassword> for TokenUser {
     responses(
         (status = 200, description = "Successful login", body = LoginResponse),
     ),
+    tag = AUTH_TAG
 )]
 pub async fn login(
 	State(pool): State<PgPool>,

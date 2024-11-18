@@ -6,13 +6,13 @@ pub mod register;
 use axum::{routing::post, Router};
 use sqlx::PgPool;
 
-pub use login::{login, LoginRequest, LoginResponse};
-pub use refresh::{refresh, RefreshResponse};
-pub use register::{register, RegisterRequest};
+pub use login::{LoginRequest, LoginResponse};
+pub use refresh::RefreshResponse;
+pub use register::RegisterRequest;
 
 pub fn routes() -> Router<PgPool> {
 	Router::new()
-		.route("/login", post(login))
-		.route("/refresh", post(refresh))
-		.route("/register", post(register))
+		.route("/login", post(login::login))
+		.route("/register", post(register::register))
+		.route("/refresh", post(refresh::refresh))
 }

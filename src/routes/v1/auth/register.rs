@@ -7,6 +7,7 @@ use uuid::Uuid;
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
+	routes::v1::AUTH_TAG,
 	utils::pwd::hash_pwd,
 };
 
@@ -28,6 +29,7 @@ pub struct RegisterRequest {
     responses(
         (status = 200, description = "Account created", body = String),
     ),
+    tag = AUTH_TAG
 )]
 pub async fn register(
 	State(pool): State<PgPool>,

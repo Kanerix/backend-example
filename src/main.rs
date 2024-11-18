@@ -38,11 +38,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.expect("migrations failed against database");
 
 	let app = Router::new()
+		.nest("/api/v1", routes::v1::routes())
 		.merge(SwaggerUi::new("/swagger-ui").urls(vec![(
 			Url::with_primary("v1", "/api-docs/openapi_v1.json", true),
 			routes::v1::ApiDoc::openapi(),
 		)]))
-		.nest("/api/v1", routes::v1::routes())
 		.with_state(pool)
 		.layer(
 			CorsLayer::new()

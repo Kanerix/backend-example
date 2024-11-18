@@ -7,6 +7,7 @@ use utoipa::ToSchema;
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
+	routes::v1::AUTH_TAG,
 	utils::token::generate_access_token,
 };
 
@@ -20,12 +21,14 @@ pub struct RefreshResponse {
 	post,
 	path = "/api/v1/auth/refresh",
 	request_body(
+        content = RefreshResponse,
 		description = "Refresh your access token using a refresh token",
 		content_type = "application/json"
 	),
 	responses(
         (status = 200, description = "Successful refresh", body = RefreshResponse),
-    )
+    ),
+    tag = AUTH_TAG
 )]
 pub async fn refresh(
 	State(pool): State<PgPool>,
