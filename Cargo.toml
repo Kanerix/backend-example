@@ -9,11 +9,10 @@ axum = { version = "0.7", features = ["macros", "tokio"] }
 axum-extra = { version = "0.9", features = ["cookie"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["full"] }
-utoipa = { version = "5.1", features = ["uuid", "chrono"] }
-utoipa-axum = "0.1"
+utoipa = { version = "5.2", features = ["uuid", "chrono"] }
 utoipa-swagger-ui = { version = "8.0", features = ["axum", "reqwest"] }
 # -- Async
-tokio = { version = "1.35", features = ["full"] }
+tokio = { version = "1.41", features = ["full"] }
 futures-util = "0.3"
 # -- Tracing
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
@@ -33,18 +32,14 @@ sqlx = { version = "0.8", features = [
 ] }
 # -- Other
 anyhow = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 rand = "0.8"
 jsonwebtoken = "9.2"
 chrono = { version = "0.4", features = ["serde"] }
 argon2 = { version = "0.5", features = ["std"] }
 dotenvy = "0.15"
 lazy_static = "1.4"
-regex = "1.10"
-
-
-[build]
-rustflags = ["-Z", "threads=8"]
+regex = "1.11"
 
 
 [[bin]]
