@@ -11,9 +11,9 @@ lazy_static! {
 
 /// A macro that generates a configuration struct.
 ///
-/// The struct will have fields for each of the variables
-/// and will have a `from_env` method to load the variables
-/// from environment variables.
+/// The struct will have fields for each of the idents given
+/// in the macro and will have a `from_env` method to load its
+/// fields from environment variables.
 macro_rules! generate_config {
 	($($name:ident: $type:ty = $func:tt),+) => {
 		/// Configuration for the application.
