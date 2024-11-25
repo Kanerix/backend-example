@@ -2,8 +2,6 @@
 
 /// Configurations for the application environment.
 pub mod config;
-/// Database middleware for the application.
-pub mod db;
 /// Error module for endpoint handlers.
 pub mod error;
 /// Middleware module for the application.
