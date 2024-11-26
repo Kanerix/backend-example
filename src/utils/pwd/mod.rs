@@ -1,15 +1,17 @@
+//! Functions related to password hashing and verification.
+
 /// Errors that can occur when working with passwords.
-pub mod error;
+mod error;
 /// Parts needed for hashing and validating passwords.
-pub mod parts;
+mod parts;
 /// Schemas for hashing and validating passwords.
-pub mod scheme;
+mod scheme;
 
 use std::str::FromStr;
 
-use error::{Error, Result};
-use parts::{HashParts, PwdParts};
-use scheme::{get_scheme, Scheme};
+pub use error::{Error, Result};
+pub use parts::{HashParts, PwdParts};
+pub use scheme::{get_scheme, Scheme};
 
 /// The default scheme used for hashing passwords.
 static DEFAULT_SCHEME: &str = "01";

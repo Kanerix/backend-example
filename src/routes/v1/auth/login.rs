@@ -12,7 +12,7 @@ use crate::{
 	routes::v1::AUTH_TAG,
 	utils::{
 		pwd::validate_pwd,
-		token::{claims::TokenUser, generate_access_token, generate_refresh_token},
+		token::{generate_access_token, generate_refresh_token, TokenUser},
 	},
 };
 

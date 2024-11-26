@@ -1,3 +1,5 @@
+//! Errors that can occur when handling different schemes.
+
 use argon2::password_hash::Error as Argon2Error;
 
 /// A type alias for [`Result<T, Error>`].

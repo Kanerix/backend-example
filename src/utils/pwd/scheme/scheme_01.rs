@@ -1,3 +1,5 @@
+//! Scheme 0 implemented using Argon2.
+
 use std::sync::OnceLock;
 
 use argon2::{

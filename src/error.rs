@@ -1,3 +1,5 @@
+//! Error module for endpoint handlers.
+
 use axum::{
 	http::StatusCode,
 	response::{IntoResponse, Response},

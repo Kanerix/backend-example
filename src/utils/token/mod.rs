@@ -1,9 +1,12 @@
-pub mod claims;
-pub mod error;
+//! Functions related to token generation and verification.
+
+mod claims;
+mod error;
 mod keys;
 
-use claims::{TokenClaims, TokenUser};
-use error::{Error, Result};
+pub use error::{Error, Result};
+
+pub use claims::{TokenClaims, TokenUser};
 use jsonwebtoken::{decode, encode, TokenData};
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
