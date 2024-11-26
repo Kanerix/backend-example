@@ -32,6 +32,7 @@ jobs:
     with:
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       image_name: ${{ needs.prepare-pipeline.outputs.image_name }}
+      package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
 
   # terraform:
   #   uses: lerpz-com/github-actions/.github/workflows/terraform.yml@v1
