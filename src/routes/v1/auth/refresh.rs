@@ -40,12 +40,12 @@ pub async fn refresh(
 	let refresh_token = refresh_cookie.value();
 
 	let user = sqlx::query_as!(
-		models::user::User,
+		models::User,
 		"SELECT
         u.id,
         u.email,
         u.username,
-        u.role AS \"role: models::user::UserRole\",
+        u.role AS \"role: models::UserRole\",
         u.created_at,
         u.updated_at
         FROM users u

@@ -42,14 +42,14 @@ pub async fn register(
 	let mut tx = pool.begin().await?;
 
 	let user = sqlx::query_as!(
-		models::user::User,
+		models::User,
 		"INSERT INTO users ( email, username )
         VALUES ($1, $2)
         RETURNING
         users.id,
         users.email,
         users.username,
-        users.role AS \"role: models::user::UserRole\",
+        users.role AS \"role: models::UserRole\",
         users.created_at,
         users.updated_at",
 		&payload.email,
