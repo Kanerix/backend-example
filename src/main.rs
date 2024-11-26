@@ -5,7 +5,7 @@ use axum::{
 	http::{Method, Request},
 	Router,
 };
-use lerpz_backend::{config::CONFIG, routes};
+use lerpz_backend::{config::config, routes};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info_span;
@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 	let pool = PgPoolOptions::new()
 		.max_connections(5)
 		.acquire_timeout(Duration::from_secs(3))
-		.connect(&CONFIG.DATABASE_URL)
+		.connect(config().DATABASE_URL.as_str())
 		.await
 		.expect("can't connect to database");
 
@@ -46,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.with_state(pool)
 		.layer(
 			CorsLayer::new()
-				.allow_origin(CONFIG.API_ORIGIN.clone())
+				.allow_origin(config().API_ORIGIN.clone())
 				.allow_methods(vec![Method::GET, Method::POST, Method::DELETE, Method::PUT]),
 		)
 		.layer(
