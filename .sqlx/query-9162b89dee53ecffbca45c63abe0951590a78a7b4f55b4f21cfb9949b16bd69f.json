@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO refresh_tokens ( user_id, token ) VALUES ($1, $2)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Bpchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9162b89dee53ecffbca45c63abe0951590a78a7b4f55b4f21cfb9949b16bd69f"
+}

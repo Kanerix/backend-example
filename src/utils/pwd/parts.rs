@@ -1,6 +1,5 @@
-use lazy_static::lazy_static;
 use regex::Regex;
-use std::str::FromStr;
+use std::{str::FromStr, sync::OnceLock};
 
 use super::{error::Error, DEFAULT_SCHEME};
 
@@ -8,7 +7,7 @@ use super::{error::Error, DEFAULT_SCHEME};
 ///
 /// This is needed when turning a password into a hash.
 pub struct PwdParts {
-	pub scheme_name: String,
+	pub scheme: String,
 	pub salt: String,
 	pub pwd: String,
 }
@@ -16,9 +15,9 @@ pub struct PwdParts {
 /// What passwords get turned into when hashed.
 ///
 /// This is needed for validating a password hash.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HashParts {
-	pub scheme_name: String,
+	pub scheme: String,
 	pub hash: String,
 }
 
@@ -28,7 +27,7 @@ impl PwdParts {
 	/// This will have the latest scheme for hashing.
 	pub fn new(pwd: String, salt: String) -> Self {
 		Self {
-			scheme_name: DEFAULT_SCHEME.into(),
+			scheme: DEFAULT_SCHEME.into(),
 			salt,
 			pwd,
 		}
@@ -37,38 +36,39 @@ impl PwdParts {
 
 impl HashParts {
 	/// Creates a new [`HashParts`] structure.
-	pub fn new(scheme_name: String, hash: String) -> Self {
-		Self { scheme_name, hash }
+	pub fn new(scheme: String, hash: String) -> Self {
+		Self { scheme, hash }
 	}
 }
 
-lazy_static! {
-	static ref PWD_PARTS_REGEX: Regex = Regex::new(r"^#(?<scheme_name>\w+)#(?<hash>.+)$").unwrap();
+fn pwd_parts_regex() -> &'static Regex {
+	static PWD_PARTS_REGEX: OnceLock<Regex> = OnceLock::new();
+	PWD_PARTS_REGEX.get_or_init(|| Regex::new(r"^#(?<scheme>\w+)#(?<hash>.+)$").unwrap())
 }
 
 impl FromStr for HashParts {
 	type Err = Error;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		let captures = PWD_PARTS_REGEX.captures(s).ok_or(Error::PwdParsingFailed(
-			"password hash is not in the correct format".to_string(),
-		))?;
-
-		let scheme_name = captures
-			.name("scheme_name")
+		let captures = pwd_parts_regex()
+			.captures(s)
 			.ok_or(Error::PwdParsingFailed(
-				"missing \"scheme_name\" part in password hash".to_string(),
-			))?
-			.as_str()
-			.to_string();
-		let hash = captures
-			.name("hash")
-			.ok_or(Error::PwdParsingFailed(
-				"missing \"hash\" part in password hash".to_string(),
-			))?
-			.as_str()
-			.to_string();
+				"password hash is not in the correct format".to_string(),
+			))?;
 
-		Ok(HashParts::new(scheme_name, hash))
+		let get_group = |name: &str| -> Result<String, Self::Err> {
+			Ok(captures
+				.name(name)
+				.ok_or(Error::PwdParsingFailed(
+					"missing \"scheme\" part in password hash".to_string(),
+				))?
+				.as_str()
+				.to_string())
+		};
+
+		let scheme = get_group("scheme")?;
+		let hash = get_group("hash")?;
+
+		Ok(HashParts::new(scheme, hash))
 	}
 }

@@ -6,7 +6,7 @@ use axum::{
 
 use crate::{
 	error::HandlerError,
-	utils::token::{claims::TokenUser, decode_access_token},
+	utils::token::{decode_access_token, TokenUser},
 };
 
 #[derive(Debug, Clone)]

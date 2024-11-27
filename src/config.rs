@@ -1,19 +1,24 @@
+//! Configurations for the application environment.
+
+use std::sync::OnceLock;
+
 use axum::http::HeaderValue;
-use lazy_static::lazy_static;
 
 use crate::utils::env::{self, get_env, get_env_parse};
 
-lazy_static! {
-	/// Global configuration for the application.
-	pub static ref CONFIG: Config =
-		Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {}", err));
+/// The config generated from environment variables.
+pub fn config() -> &'static Config {
+	static CONFIG: OnceLock<Config> = OnceLock::new();
+	CONFIG.get_or_init(|| {
+		Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {err}"))
+	})
 }
 
 /// A macro that generates a configuration struct.
 ///
-/// The struct will have fields for each of the variables
-/// and will have a `from_env` method to load the variables
-/// from environment variables.
+/// The struct will have fields for each of the idents given
+/// in the macro and will have a `from_env` method to load its
+/// fields from environment variables.
 macro_rules! generate_config {
 	($($name:ident: $type:ty = $func:tt),+) => {
 		/// Configuration for the application.

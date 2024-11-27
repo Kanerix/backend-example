@@ -15,6 +15,3 @@ target
 keys
 .env.example
 .env.test
-
-# Other
-README.md

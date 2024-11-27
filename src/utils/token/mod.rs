@@ -1,9 +1,12 @@
-pub mod claims;
-pub mod error;
+//! Functions related to token generation and verification.
+
+mod claims;
+mod error;
 mod keys;
 
-use claims::{TokenClaims, TokenUser};
-use error::{Error, Result};
+pub use error::{Error, Result};
+
+pub use claims::{TokenClaims, TokenUser};
 use jsonwebtoken::{decode, encode, TokenData};
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
@@ -14,7 +17,7 @@ pub fn generate_access_token(user: impl Into<TokenUser>) -> Result<String> {
 			..Default::default()
 		},
 		&TokenClaims::new(user),
-		&keys::JWT_ENCODE_KEY,
+		keys::jwt_encode_key(),
 	)
 	.map_err(Error::TokenError)
 }
@@ -22,7 +25,7 @@ pub fn generate_access_token(user: impl Into<TokenUser>) -> Result<String> {
 pub fn decode_access_token(token: &str) -> Result<TokenData<TokenClaims>> {
 	decode(
 		token,
-		&keys::JWT_DECODE_KEY,
+		keys::jwt_decode_key(),
 		&jsonwebtoken::Validation::default(),
 	)
 	.map_err(Error::TokenError)

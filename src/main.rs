@@ -5,7 +5,7 @@ use axum::{
 	http::{Method, Request},
 	Router,
 };
-use lerpz_backend::{config::CONFIG, routes};
+use lerpz_backend::{config::config, routes};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info_span;
@@ -28,25 +28,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 	let pool = PgPoolOptions::new()
 		.max_connections(5)
 		.acquire_timeout(Duration::from_secs(3))
-		.connect(&CONFIG.DATABASE_URL)
+		.connect(config().DATABASE_URL.as_str())
 		.await
-		.expect("can't connect to database");
+		.unwrap_or_else(|err| panic!("can't connect to database: {err}"));
 
 	sqlx::migrate!()
 		.run(&pool)
 		.await
-		.expect("migrations failed against database");
+		.unwrap_or_else(|err| panic!("migrations failed against database: {err}"));
 
 	let app = Router::new()
+		.nest("/api/v1", routes::v1::routes())
 		.merge(SwaggerUi::new("/swagger-ui").urls(vec![(
 			Url::with_primary("v1", "/api-docs/openapi_v1.json", true),
 			routes::v1::ApiDoc::openapi(),
 		)]))
-		.nest("/api/v1", routes::v1::routes())
 		.with_state(pool)
 		.layer(
 			CorsLayer::new()
-				.allow_origin(CONFIG.API_ORIGIN.clone())
+				.allow_origin(config().API_ORIGIN.clone())
 				.allow_methods(vec![Method::GET, Method::POST, Method::DELETE, Method::PUT]),
 		)
 		.layer(
@@ -66,6 +66,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
 	let listener = tokio::net::TcpListener::bind(addr).await?;
+	tracing::info!("server started listening on {addr}");
+
 	axum::serve(listener, app.into_make_service())
 		.with_graceful_shutdown(shutdown_signal())
 		.await?;

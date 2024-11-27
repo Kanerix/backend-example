@@ -1,3 +1,5 @@
+//! Schemas used for password hashing.
+
 /// This module contains the password hashing and validation schemes.
 pub mod error;
 /// Password scheme that uses argon2 for hashing and validating passwords.

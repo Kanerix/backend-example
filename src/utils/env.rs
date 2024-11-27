@@ -1,3 +1,5 @@
+//! Functions that are used in multiple places in the codebase.
+
 use std::{ffi::OsStr, str::FromStr};
 
 /// A type alias for handling results from this module.
