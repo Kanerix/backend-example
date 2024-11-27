@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO users ( email, username )\n        VALUES ($1, $2)\n        RETURNING\n        users.id,\n        users.email,\n        users.username,\n        users.role AS \"role: models::user::UserRole\",\n        users.created_at,\n        users.updated_at",
+  "query": "SELECT\n        u.id,\n        u.email,\n        u.username,\n        u.role AS \"role: models::UserRole\",\n        u.created_at,\n        u.updated_at\n        FROM users u\n        JOIN refresh_tokens t ON u.id = t.user_id\n        WHERE expires_at > NOW() AND token = $1",
   "describe": {
     "columns": [
       {
@@ -20,7 +20,7 @@
       },
       {
         "ordinal": 3,
-        "name": "role: models::user::UserRole",
+        "name": "role: models::UserRole",
         "type_info": {
           "Custom": {
             "name": "role",
@@ -47,8 +47,7 @@
     ],
     "parameters": {
       "Left": [
-        "Varchar",
-        "Varchar"
+        "Bpchar"
       ]
     },
     "nullable": [
@@ -60,5 +59,5 @@
       false
     ]
   },
-  "hash": "8a2efd0c2ade694c11922435289b7894d48704f6167dbdaa55b2ad0a9302f3fa"
+  "hash": "0eb8608bd3a97d4fc48d4e5bf30d7b9ac1ad2abf24de0386a016df3f00c54e7e"
 }
