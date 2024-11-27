@@ -1,12 +1,14 @@
 use crate::models::user::{User, UserRole};
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
+use uuid::Uuid;
 
 /// Represent all the claims for the token.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TokenClaims {
 	/// This is the ID of the token. This will be some random UUID.
-	pub sub: uuid::Uuid,
+	pub sub: Uuid,
 	/// This is at which time the token will expire.
 	pub exp: i64,
 	/// This is at which time the token should be valid for.
@@ -26,7 +28,7 @@ pub struct TokenClaims {
 /// The user field in the claims.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TokenUser {
-	pub id: uuid::Uuid,
+	pub id: Uuid,
 	pub username: String,
 	pub email: String,
 	pub role: UserRole,
@@ -35,7 +37,7 @@ pub struct TokenUser {
 /// Generates the `JwtAudience` enum.
 ///
 /// This enum is used to represent the audience of the token.
-macro_rules! generate_iss {
+macro_rules! generate_aud {
     ($($name:ident = $val:literal),+) => {
         /// The audience of the token.
         ///
@@ -53,15 +55,15 @@ macro_rules! generate_iss {
     }
 }
 
-/// Generates the `JwtAudience` enum.
+/// Generates the `JwtIssuier` enum.
 ///
-/// This enum is used to represent the audience of the token.
-macro_rules! generate_aud {
+/// This enum is used to represent the issuer of the token.
+macro_rules! generate_iss {
     ($($name:ident = $val:literal),+)=> {
         /// The issuer of the token.
         ///
         /// This is what service created the token for the user.
-        /// Whis is most often the domain of the service.
+        /// This is most often the domain of the service.
         #[allow(clippy::upper_case_acronyms)]
         #[non_exhaustive]
         #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
@@ -74,13 +76,13 @@ macro_rules! generate_aud {
     }
 }
 
-generate_iss! {
+generate_aud! {
 	MainWebsite = "lerpz.com",
 	Account = "account.lerpz.com",
 	Dashboard = "dashboard.lerpz.com"
 }
 
-generate_aud! {
+generate_iss! {
 	API = "api.lerpz.com"
 }
 
@@ -105,10 +107,10 @@ impl From<User> for TokenUser {
 impl From<TokenUser> for TokenClaims {
 	fn from(user: TokenUser) -> Self {
 		Self {
-			sub: uuid::Uuid::new_v4(),
-			exp: chrono::Utc::now().timestamp() + 60 * 15,
-			nbf: chrono::Utc::now().timestamp(),
-			iat: chrono::Utc::now().timestamp(),
+			sub: Uuid::new_v4(),
+			exp: Utc::now().timestamp() + 60 * 15,
+			nbf: Utc::now().timestamp(),
+			iat: Utc::now().timestamp(),
 			iss: HashSet::new(),
 			aud: HashSet::new(),
 			user,
