@@ -6,8 +6,8 @@ on:
       build_override:
         description: Create release override
         required: false
-        default: false
         type: boolean
+        default: false
 
   push:
     branches:
