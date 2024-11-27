@@ -18,22 +18,31 @@ jobs:
     uses: lerpz-com/github-actions/.github/workflows/prepare-pipeline.yml@v1
     secrets: inherit
 
-  rust-lint:
+  rust-lint-and-test:
     uses: lerpz-com/github-actions/.github/workflows/rust-lint-and-test.yml@v1
     needs: [prepare-pipeline]
     secrets: inherit
     with:
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
 
+  version-check:
+    uses: lerpz-com/github-actions/.github/workflows/version-check.yml@v1
+    needs: [prepare-pipeline, rust-lint-and-test]
+    secrets: inherit
+    with:
+      deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
+      package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
+
   build-and-push-image:
     uses: lerpz-com/github-actions/.github/workflows/docker-build-and-push.yml@v1
-    needs: [prepare-pipeline, rust-lint]
+    needs: [prepare-pipeline, version-check]
     secrets: inherit
     with:
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       image_name: ${{ needs.prepare-pipeline.outputs.image_name }}
       package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
 
+  # https://github.com/lerpz-com/lerpz-backend/issues/7
   # terraform:
   #   uses: lerpz-com/github-actions/.github/workflows/terraform.yml@v1
   #   needs: [prepare-pipeline, build-and-push-image]
