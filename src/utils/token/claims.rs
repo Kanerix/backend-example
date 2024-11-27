@@ -41,6 +41,7 @@ macro_rules! generate_iss {
         ///
         /// This this is who/what the token is for. Most often
         /// the domain of a website or the name of an app.
+        #[allow(clippy::upper_case_acronyms)]
         #[non_exhaustive]
         #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
         pub enum JwtAudience {
@@ -61,6 +62,7 @@ macro_rules! generate_aud {
         ///
         /// This is what service created the token for the user.
         /// Whis is most often the domain of the service.
+        #[allow(clippy::upper_case_acronyms)]
         #[non_exhaustive]
         #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
         pub enum JwtIssuer {
