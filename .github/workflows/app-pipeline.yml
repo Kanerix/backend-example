@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       build_override:
-        description: "Create a new release"
+        description: Create release override
         required: false
         default: false
         type: boolean
@@ -37,7 +37,7 @@ jobs:
     needs: [prepare-pipeline, rust-lint-and-test]
     secrets: inherit
     with:
-      version_ovverride: ${{ inputs.build_override }}
+      validate_override: ${{ inputs.build_override }}
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
 
