@@ -2,16 +2,23 @@ name: Project pipeline to deploy rust projects using containers
 
 on:
   workflow_dispatch:
+    inputs:
+      build_override:
+        description: "Create a new release"
+        required: false
+        default: false
+        type: boolean
+
   push:
     branches:
-      - '**'
+      - "**"
     paths:
-      - 'src/**'
-      - 'terraform/**'
-      - 'migrations/**'
-      - 'Dockerfile'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
+      - "src/**"
+      - "terraform/**"
+      - "migrations/**"
+      - "Dockerfile"
+      - "Cargo.toml"
+      - "Cargo.lock"
 
 jobs:
   prepare-pipeline:
@@ -30,6 +37,7 @@ jobs:
     needs: [prepare-pipeline, rust-lint-and-test]
     secrets: inherit
     with:
+      version_ovverride: ${{ inputs.build_override }}
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
 
@@ -38,6 +46,7 @@ jobs:
     needs: [prepare-pipeline, version-check]
     secrets: inherit
     with:
+      build_override: ${{ inputs.build_override }}
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       image_name: ${{ needs.prepare-pipeline.outputs.image_name }}
       package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
