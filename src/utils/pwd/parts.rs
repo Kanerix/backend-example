@@ -66,7 +66,7 @@ impl FromStr for HashParts {
 				.to_string())
 		};
 
-		let scheme = get_group("scheme_name")?;
+		let scheme = get_group("scheme")?;
 		let hash = get_group("hash")?;
 
 		Ok(HashParts::new(scheme, hash))

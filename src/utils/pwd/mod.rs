@@ -58,7 +58,6 @@ pub async fn validate_pwd(
 	pwd_salt: Option<impl Into<String>>,
 ) -> Result<bool> {
 	let pwd_hash = HashParts::from_str(pwd_hash)?;
-
 	let pwd_ref = pwd_ref.into();
 	let pwd_salt = pwd_salt.map(|v| v.into());
 	unsafe { validate_pwd_parts(pwd_hash, pwd_ref, pwd_salt).await }
