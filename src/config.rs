@@ -10,7 +10,7 @@ use crate::utils::env::{self, get_env, get_env_parse};
 pub fn config() -> &'static Config {
 	static CONFIG: OnceLock<Config> = OnceLock::new();
 	CONFIG.get_or_init(|| {
-		Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {}", err))
+		Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {err}"))
 	})
 }
 

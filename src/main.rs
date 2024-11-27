@@ -30,12 +30,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.acquire_timeout(Duration::from_secs(3))
 		.connect(config().DATABASE_URL.as_str())
 		.await
-		.expect("can't connect to database");
+		.unwrap_or_else(|err| panic!("can't connect to database: {err}"));
 
 	sqlx::migrate!()
 		.run(&pool)
 		.await
-		.expect("migrations failed against database");
+		.unwrap_or_else(|err| panic!("migrations failed against database: {err}"));
 
 	let app = Router::new()
 		.nest("/api/v1", routes::v1::routes())
