@@ -20,13 +20,11 @@ where
 	type Rejection = HandlerError;
 
 	async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-		let header = parts
+		let token = parts
 			.headers
 			.get(header::AUTHORIZATION)
 			.and_then(|header| header.to_str().ok())
-			.ok_or(HandlerError::unauthorized())?;
-
-		let token = header
+			.ok_or(HandlerError::unauthorized())?
 			.split_whitespace()
 			.last()
 			.ok_or(HandlerError::unauthorized())?;
