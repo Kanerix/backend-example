@@ -8,6 +8,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use tracing::error;
 use utoipa::ToSchema;
+use uuid::Uuid;
 
 /// A type alias for [`Result<T, HandlerError>`].
 ///
@@ -61,7 +62,7 @@ where
 	/// contain information that should not be leaked and might help attackers
 	/// understand how to exploit the application.
 	#[serde(skip_serializing_if = "Option::is_none")]
-	log_id: Option<uuid::Uuid>,
+	log_id: Option<String>,
 }
 
 impl<D> IntoResponse for HandlerError<D>
@@ -75,7 +76,7 @@ where
 	fn into_response(mut self) -> Response {
 		if let Some(error) = self.inner.as_ref() {
 			if self.log_id.is_none() {
-				self.log_id = Some(uuid::Uuid::new_v4())
+				self.log_id = Some(Uuid::new_v4().into())
 			};
 
 			let HandlerError {
@@ -84,8 +85,8 @@ where
 				ref log_id,
 				..
 			} = self;
-			// The `log_id` is guaranteed to be set (above).
-			let log_id = log_id.unwrap();
+
+			let log_id = log_id.as_ref().unwrap(); // `log_id` is guaranteed to be set (above).
 
 			if self.status_code.is_server_error() {
 				error!(log_id = %log_id, server_error = %error, "An server error occurred");
@@ -181,17 +182,18 @@ where
 	/// # Safety
 	///
 	/// Make sure you use a globally unique identifier for the `log_id`.
-	pub unsafe fn with_log_id<U>(&mut self, log_id: U)
+	pub unsafe fn with_log_id<U>(mut self, log_id: U) -> Self
 	where
-		U: Into<uuid::Uuid>,
+		U: Into<String>,
 	{
 		self.log_id = Some(log_id.into());
+		self
 	}
 }
 
 #[cfg(test)]
 mod test {
-	use super::*;
+    use super::*;
 
 	#[derive(Serialize, Default)]
 	struct Detail {
@@ -216,9 +218,7 @@ mod test {
 
 		assert!(handler_error.inner.is_some());
 		assert!(handler_error.detail.is_some());
-
-		// `log_id` should only be set when turned into a response.
-		assert!(handler_error.log_id.is_none());
+		assert!(handler_error.log_id.is_none()); // `log_id` is set when turned into a response.
 
 		let response = handler_error.into_response();
 
@@ -227,14 +227,26 @@ mod test {
 
 	#[test]
 	fn test_any_error_to_handler_result() {
-		let example_handler = || -> HandlerResult<i32, HandlerError> { Ok("abc".parse::<i32>()?) };
+		let example_handler = || -> HandlerResult<i32> { Ok("abc".parse::<i32>()?) };
 
 		let handler_error = example_handler().unwrap_err();
 
 		assert!(handler_error.status_code.is_server_error());
 		assert!(handler_error.inner.is_some());
+		assert!(handler_error.log_id.is_none()); // `log_id` is set when turned into a response.
+	}
 
-		// `log_id` should only be set when turned into a response.
-		assert!(handler_error.log_id.is_none());
+	#[test]
+	fn test_set_unsafe_log_id() {
+		let example_handler_one = || -> HandlerResult<i32> { Ok("abc".parse::<i32>()?) };
+		let example_handler_two = || -> HandlerResult<f64> { Ok("zyx".parse::<f64>()?) };
+
+		let handler_error_one = unsafe {example_handler_one().unwrap_err().with_log_id("example_log_id") };
+		let handler_error_two = unsafe {example_handler_two().unwrap_err().with_log_id("example_log_id") };
+
+		assert!(handler_error_one.log_id.is_some());
+		assert!(handler_error_two.log_id.is_some());
+
+		assert_eq!(handler_error_one.log_id, handler_error_two.log_id)
 	}
 }
