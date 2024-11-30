@@ -15,9 +15,19 @@ do
 
   CLIPPY_EXIT_CODE=$?
 
-  if [ $CLIPPY_EXIT_CODE -ne 0 ]; then
+  if [[ $CLIPPY_EXIT_CODE -ne 0 ]]; then
     echo "cargo clippy reported issues on branch $remote_ref"
     exit $CLIPPY_EXIT_CODE
+  fi
+
+  echo "Running cargo sqlx prepare"
+  cargo sqlx prepare --check
+
+  SLQX_EXIT_CODE=$?
+
+  if [[ $SQLX_EXIT_CODE -ne 0 ]]; then
+    echo "cargo sqlx prepare reported issues on branch $remote_ref"
+    exit $SQLX_EXIT_CODE
   fi
 done
 
