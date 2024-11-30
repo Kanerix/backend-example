@@ -16,16 +16,12 @@ use crate::{
 	},
 };
 
+use super::TokenResponse;
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 pub struct LoginRequest {
 	username: String,
 	password: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct LoginResponse {
-	kind: String,
-	token: String,
 }
 
 pub struct UserWithPassword {
@@ -36,7 +32,6 @@ pub struct UserWithPassword {
 	pub hash: String,
 	pub salt: Option<String>,
 	pub created_at: DateTime<Utc>,
-	pub updated_at: DateTime<Utc>,
 }
 
 impl From<&UserWithPassword> for TokenUser {
@@ -59,7 +54,7 @@ impl From<&UserWithPassword> for TokenUser {
         content_type = "application/json"
     ),
     responses(
-        (status = 200, description = "Successful login", body = LoginResponse),
+        (status = 200, description = "Successful login", body = TokenResponse),
     ),
     tag = AUTH_TAG
 )]
@@ -75,7 +70,6 @@ pub async fn login(
         u.username,
         u.role AS \"role: models::UserRole\",
         u.created_at,
-        u.updated_at,
         p.hash,
         p.salt
         FROM users u
@@ -112,7 +106,7 @@ pub async fn login(
 
 	Ok((
 		CookieJar::new().add(refresh_cookie),
-		Json(LoginResponse {
+		Json(TokenResponse {
 			kind: "Bearer".into(),
 			token: access_token,
 		}),

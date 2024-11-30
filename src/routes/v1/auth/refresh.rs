@@ -1,8 +1,6 @@
 use axum::{extract::State, response::IntoResponse, Json};
 use axum_extra::extract::CookieJar;
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use utoipa::ToSchema;
 
 use crate::{
 	error::{HandlerError, HandlerResult},
@@ -11,22 +9,13 @@ use crate::{
 	utils::token::generate_access_token,
 };
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct RefreshResponse {
-	kind: String,
-	token: String,
-}
+use super::TokenResponse;
 
 #[utoipa::path(
 	post,
 	path = "/api/v1/auth/refresh",
-	request_body(
-        content = RefreshResponse,
-		description = "Refresh your access token using a refresh token",
-		content_type = "application/json"
-	),
 	responses(
-        (status = 200, description = "Successful refresh", body = RefreshResponse),
+        (status = 200, description = "Successful refresh", body = TokenResponse),
     ),
     tag = AUTH_TAG
 )]
@@ -46,8 +35,7 @@ pub async fn refresh(
         u.email,
         u.username,
         u.role AS \"role: models::UserRole\",
-        u.created_at,
-        u.updated_at
+        u.created_at
         FROM users u
         JOIN refresh_tokens t ON u.id = t.user_id
         WHERE expires_at > NOW() AND token = $1",
@@ -62,7 +50,7 @@ pub async fn refresh(
 
 	let access_token = generate_access_token(user)?;
 
-	Ok(Json(RefreshResponse {
+	Ok(Json(TokenResponse {
 		kind: "Bearer".into(),
 		token: access_token,
 	}))

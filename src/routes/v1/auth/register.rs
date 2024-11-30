@@ -50,8 +50,7 @@ pub async fn register(
         users.email,
         users.username,
         users.role AS \"role: models::UserRole\",
-        users.created_at,
-        users.updated_at",
+        users.created_at",
 		&payload.email,
 		&payload.username,
 	)
