@@ -193,7 +193,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::*;
+	use super::*;
 
 	#[derive(Serialize, Default)]
 	struct Detail {
@@ -237,15 +237,26 @@ mod test {
 	}
 
 	#[test]
-	fn test_set_unsafe_log_id() {
+	fn test_unsafe_set_log_id() {
 		let example_handler_one = || -> HandlerResult<i32> { Ok("abc".parse::<i32>()?) };
 		let example_handler_two = || -> HandlerResult<f64> { Ok("zyx".parse::<f64>()?) };
+		let example_handler_three = || -> HandlerResult<i16> { Ok("qwe".parse::<i16>()?) };
 
-		let handler_error_one = unsafe {example_handler_one().unwrap_err().with_log_id("example_log_id") };
-		let handler_error_two = unsafe {example_handler_two().unwrap_err().with_log_id("example_log_id") };
+		let handler_error_one = unsafe {
+			example_handler_one()
+				.unwrap_err()
+				.with_log_id("example_log_id")
+		};
+		let handler_error_two = unsafe {
+			example_handler_two()
+				.unwrap_err()
+				.with_log_id("example_log_id")
+		};
+		let handler_error_three = example_handler_three().unwrap_err();
 
 		assert!(handler_error_one.log_id.is_some());
 		assert!(handler_error_two.log_id.is_some());
+		assert!(handler_error_three.log_id.is_none());
 
 		assert_eq!(handler_error_one.log_id, handler_error_two.log_id)
 	}
