@@ -5,7 +5,6 @@ on:
     inputs:
       build_override:
         description: Create release override
-        required: false
         type: boolean
         default: false
 
