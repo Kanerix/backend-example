@@ -19,6 +19,7 @@ pub fn routes() -> Router<PgPool> {
 		.route("/register", post(register))
 }
 
+/// Response object for endpoints that return a token.
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct TokenResponse {
 	pub kind: String,
