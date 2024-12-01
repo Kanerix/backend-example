@@ -26,5 +26,6 @@ pub async fn destroy(
 	)
 	.execute(&pool)
 	.await?;
+
 	Ok(())
 }
