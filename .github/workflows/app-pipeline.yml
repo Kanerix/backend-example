@@ -45,7 +45,7 @@ jobs:
     needs: [prepare-pipeline, version-check]
     secrets: inherit
     with:
-      build_override: ${{ inputs.build_override }}
+      build_override: ${{ inputs.build_override || false }}
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       image_name: ${{ needs.prepare-pipeline.outputs.image_name }}
       package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
