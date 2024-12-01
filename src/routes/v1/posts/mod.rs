@@ -2,7 +2,7 @@ mod comment;
 mod create;
 mod delete;
 mod edit;
-mod posts;
+mod list;
 
 use axum::{
 	routing::{delete, get, patch, post},
@@ -14,7 +14,7 @@ pub use comment::comment;
 pub use create::create;
 pub use delete::destroy;
 pub use edit::edit;
-pub use posts::posts;
+pub use list::list;
 
 pub fn routes() -> Router<PgPool> {
 	Router::new()
@@ -22,5 +22,5 @@ pub fn routes() -> Router<PgPool> {
 		.route("/create", post(create))
 		.route("/delete/:id", delete(destroy))
 		.route("/edit/:id", patch(edit))
-		.route("posts", get(posts))
+		.route("posts", get(list))
 }

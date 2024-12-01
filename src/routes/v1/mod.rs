@@ -1,10 +1,11 @@
 mod auth;
 mod health;
-mod post;
+mod posts;
 
 use auth as Auth;
 use axum::{routing::get, Router};
 use health as Health;
+use posts as Posts;
 
 use sqlx::PgPool;
 use utoipa::OpenApi;
@@ -17,7 +18,7 @@ pub fn routes() -> Router<PgPool> {
 	Router::new()
 		.route("/health", get(health::health))
 		.nest("/auth", Auth::routes())
-		.nest("/post", post::routes())
+		.nest("/post", Posts::routes())
 }
 
 #[derive(OpenApi)]
