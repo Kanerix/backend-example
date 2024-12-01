@@ -36,7 +36,7 @@ jobs:
     needs: [prepare-pipeline, rust-lint-and-test]
     secrets: inherit
     with:
-      validate_override: ${{ inputs.build_override }}
+      validate_override: ${{ inputs.build_override }} || false
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
 
