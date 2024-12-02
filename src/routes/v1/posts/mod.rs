@@ -1,8 +1,8 @@
-mod comment;
-mod create;
-mod delete;
-mod edit;
-mod list;
+pub mod comment;
+pub mod create;
+pub mod delete;
+pub mod edit;
+pub mod list;
 
 use axum::{
 	routing::{delete, get, patch, post},

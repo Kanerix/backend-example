@@ -13,6 +13,8 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{SwaggerUi, Url};
 
+const SWAGGER_UI_PATH: &str = "/swagger-ui";
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
 	#[cfg(debug_assertions)]
@@ -39,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	let app = Router::new()
 		.nest("/api/v1", routes::v1::routes())
-		.merge(SwaggerUi::new("/swagger-ui").urls(vec![(
+		.merge(SwaggerUi::new(SWAGGER_UI_PATH).urls(vec![(
 			Url::with_primary("v1", "/api-docs/openapi_v1.json", true),
 			routes::v1::ApiDoc::openapi(),
 		)]))

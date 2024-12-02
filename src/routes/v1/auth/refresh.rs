@@ -12,7 +12,7 @@ use crate::{
 use super::TokenResponse;
 
 #[utoipa::path(
-	post,
+	get,
 	path = "/api/v1/auth/refresh",
 	responses(
         (status = 200, description = "Successful refresh", body = TokenResponse),

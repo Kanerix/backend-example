@@ -10,9 +10,9 @@ use posts as Posts;
 use sqlx::PgPool;
 use utoipa::OpenApi;
 
-const AUTH_TAG: &str = "Authentication API endpoints";
-const POSTS_TAG: &str = "Post API endpoints";
-const HEALTH_TAG: &str = "Health API endpoints";
+const AUTH_TAG: &str = "Authentication API";
+const POSTS_TAG: &str = "Post API";
+const HEALTH_TAG: &str = "Health API";
 
 pub fn routes() -> Router<PgPool> {
 	Router::new()
@@ -27,6 +27,11 @@ pub fn routes() -> Router<PgPool> {
         Auth::login::login,
         Auth::register::register,
         Auth::refresh::refresh,
+        Posts::comment::comment,
+        Posts::create::create,
+        Posts::delete::destroy,
+        Posts::edit::edit,
+        Posts::list::list,
         Health::health,
     ),
     components(schemas(
