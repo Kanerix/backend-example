@@ -6,11 +6,11 @@ pub mod register;
 use axum::{routing::post, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use utoipa::ToSchema;
 
 pub use login::{login, LoginRequest};
 pub use refresh::refresh;
 pub use register::{register, RegisterRequest};
-use utoipa::ToSchema;
 
 pub fn routes() -> Router<PgPool> {
 	Router::new()
