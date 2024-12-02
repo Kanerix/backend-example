@@ -22,5 +22,5 @@ pub fn routes() -> Router<PgPool> {
 		.route("/create", post(create))
 		.route("/delete/:id", delete(destroy))
 		.route("/edit/:id", patch(edit))
-		.route("posts", get(list))
+		.route("/posts", get(list))
 }
