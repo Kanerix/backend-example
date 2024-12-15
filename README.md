@@ -2,7 +2,7 @@
 
 ## Information
 
-The purpose of this project is to learn and document how the diffrent parts
+The purpose of this project is to learn and document how the different parts
 of creating an API for production work. This is not meant to be used as a library
 as it is simply just for learning and exploration purposes.
 
@@ -19,8 +19,6 @@ Pre-requisites:
 
 - [Rust](https://www.rust-lang.org/learn/get-started) programming language.
 - [Docker](https://docs.docker.com/get-docker/) for containers.
-
-
 
 Setup ED25519 keys for JWT token signing.
 
