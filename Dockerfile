@@ -1,4 +1,4 @@
-FROM rust:alpine3.18 AS chef
+FROM rust:alpine3.20 AS chef
 
 RUN apk update && apk upgrade --no-cache
 RUN apk add --no-cache musl-dev pkgconf openssl libressl-dev
@@ -30,7 +30,7 @@ ENV SQLX_OFFLINE=true
 RUN cargo build --release
 
 
-FROM alpine:3.18 AS runtime
+FROM alpine:3.20 AS runtime
 WORKDIR /var/app
 
 COPY --from=builder /build/target/release/backend ./
