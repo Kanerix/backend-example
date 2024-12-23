@@ -2,16 +2,11 @@ use axum::{
 	extract::{Path, State},
 	response::IntoResponse,
 };
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use uuid::Uuid;
 
 use crate::{error::HandlerResult, middleware::AuthUser, routes::v1::POSTS_TAG};
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Params {
-	post_id: Uuid,
-}
+use super::PostParams;
 
 #[utoipa::path(
 	delete,
@@ -25,9 +20,9 @@ pub struct Params {
     tag = POSTS_TAG
 )]
 pub async fn destroy(
-	Path(params): Path<Params>,
-	State(pool): State<PgPool>,
+	Path(params): Path<PostParams>,
 	AuthUser(user): AuthUser,
+	State(pool): State<PgPool>,
 ) -> HandlerResult<impl IntoResponse> {
 	sqlx::query_as!(
 		models::Post,

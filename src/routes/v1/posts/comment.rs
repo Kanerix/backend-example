@@ -6,7 +6,7 @@ use crate::{error::HandlerResult, routes::v1::POSTS_TAG};
 	post,
 	path = "/api/v1/posts/{post_id}/comment",
 	responses(
-        (status = 200, description = "Succefully added comment to post"),
+        (status = 200, description = "List of comments on the post"),
     ),
     params(
         ("post_id" = Uuid, Path, description = "The UUID of the post")

@@ -20,8 +20,8 @@ use super::TokenResponse;
     tag = AUTH_TAG
 )]
 pub async fn refresh(
+    jar: CookieJar,
 	State(pool): State<PgPool>,
-	jar: CookieJar,
 ) -> HandlerResult<impl IntoResponse> {
 	let refresh_cookie = jar
 		.get("refresh_token")
