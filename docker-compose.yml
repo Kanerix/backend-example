@@ -1,22 +1,26 @@
 services:
-  postgres:
-    image: postgres:latest
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    container_name: surrealdb
     restart: always
-    environment: 
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=PrimaryDB
+    pull_policy: always
     ports:
-      - '5432:5432'
+      - '8000:8000'
+    command:
+      - start
+      - --log=trace
+      - --user=root
+      - --pass=root
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - surreal:/data
+
   backend:
     build: .
     restart: always
     ports:
       - '8080:8080'
     depends_on:
-      - postgres
+      - surrealdb
 
 volumes:
-  postgres_data:
+  surreal:
