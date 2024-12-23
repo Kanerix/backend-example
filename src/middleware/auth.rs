@@ -28,9 +28,7 @@ where
 			.split_whitespace()
 			.last()
 			.ok_or(HandlerError::unauthorized())?;
-
 		let token_data = decode_access_token(token).map_err(HandlerError::from)?;
-
 		Ok(AuthUser(token_data.claims.user))
 	}
 }

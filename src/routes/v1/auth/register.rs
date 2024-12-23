@@ -69,7 +69,8 @@ pub async fn register(
 	})?;
 
 	sqlx::query!(
-		"INSERT INTO passwords ( hash, salt, user_id ) VALUES ($1, $2, $3)",
+		"INSERT INTO passwords ( hash, salt, user_id )
+		VALUES ($1, $2, $3)",
 		&hash,
 		&salt,
 		&user.id,

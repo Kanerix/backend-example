@@ -1,3 +1,5 @@
+//! All endpoints related to posts.
+
 pub mod comment;
 pub mod create;
 pub mod delete;

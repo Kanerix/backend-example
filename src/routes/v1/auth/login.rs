@@ -38,9 +38,9 @@ impl From<&UserWithPassword> for TokenUser {
 	fn from(user: &UserWithPassword) -> TokenUser {
 		TokenUser {
 			id: user.id,
-			username: user.username.clone(),
-			email: user.email.clone(),
-			role: user.role.clone(),
+			username: user.username.to_owned(),
+			email: user.email.to_owned(),
+			role: user.role.to_owned(),
 		}
 	}
 }

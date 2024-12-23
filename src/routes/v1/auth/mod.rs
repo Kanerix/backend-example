@@ -1,4 +1,5 @@
-/// All routes used for authentication and authorization.
+//! All routes used for authentication and authorization.
+
 pub mod login;
 pub mod refresh;
 pub mod register;

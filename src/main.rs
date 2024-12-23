@@ -1,7 +1,6 @@
 use std::{net::Ipv4Addr, time::Duration};
 
 use axum::{
-	extract::MatchedPath,
 	http::{Method, Request},
 	Router,
 };
@@ -53,15 +52,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		)
 		.layer(
 			TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
-				let matched_path = request
-					.extensions()
-					.get::<MatchedPath>()
-					.map(MatchedPath::as_str);
-
 				info_span!(
-					"http_request",
+					"request",
+					"type" = "request",
 					method = ?request.method(),
-					matched_path,
+					uri = request.uri().to_string(),
 				)
 			}),
 		);

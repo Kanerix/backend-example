@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 # -- Web
-axum = { version = "0.7", features = ["macros", "tokio"] }
+axum = { version = "0.7", features = ["macros", "tokio", "json", "ws", "tracing"] }
 axum-extra = { version = "0.9", features = ["cookie"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["full"] }
@@ -41,6 +41,9 @@ regex = "1.11"
 uuid = { version = "1.11", features = ["v4", "serde"] }
 
 
-[[bin]]
-name = "backend"
-path = "src/main.rs"
+[profile.release]
+lto = true
+strip = true
+opt-level = 3
+panic = 'abort'
+codegen-units = 1
