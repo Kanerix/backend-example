@@ -1,18 +1,15 @@
 //! Configurations for the application environment.
 
-use std::sync::OnceLock;
+use std::sync::LazyLock;
 
 use axum::http::HeaderValue;
 
 use crate::utils::env::{self, get_env, get_env_parse};
 
 /// The config generated from environment variables.
-pub fn config() -> &'static Config {
-	static CONFIG: OnceLock<Config> = OnceLock::new();
-	CONFIG.get_or_init(|| {
-		Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {err}"))
-	})
-}
+pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
+    Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {err}"))
+});
 
 /// A macro that generates a configuration struct.
 ///
