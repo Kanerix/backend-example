@@ -9,8 +9,8 @@ axum = { version = "0.7", features = ["macros", "tokio", "json", "ws", "tracing"
 axum-extra = { version = "0.9", features = ["cookie"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["full"] }
-utoipa = { version = "5.2", features = ["uuid", "chrono"] }
-utoipa-swagger-ui = { version = "8.0", features = ["axum", "reqwest"] }
+utoipa = { version = "5.3", features = ["uuid", "chrono"] }
+utoipa-swagger-ui = { version = "8.1", features = ["axum", "reqwest"] }
 # -- Async
 tokio = { version = "1.41", features = ["full"] }
 futures-util = "0.3"
@@ -39,7 +39,6 @@ argon2 = { version = "0.5", features = ["std"] }
 dotenvy = "0.15"
 regex = "1.11"
 uuid = { version = "1.11", features = ["v4", "serde"] }
-
 
 [profile.release]
 lto = true
