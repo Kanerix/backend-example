@@ -4,8 +4,9 @@ mod posts;
 
 use auth as Auth;
 use axum::{routing::get, Router};
-use health as Health;
-use posts as Posts;
+
+use crate::routes::v1::health as Health;
+use crate::routes::v1::posts as Posts;
 
 use sqlx::PgPool;
 use utoipa::OpenApi;
@@ -27,11 +28,14 @@ pub fn routes() -> Router<PgPool> {
         Auth::login::login,
         Auth::register::register,
         Auth::refresh::refresh,
-        Posts::comment::comment,
         Posts::create::create,
         Posts::delete::destroy,
         Posts::edit::edit,
         Posts::list::list,
+        Posts::comments::create::create,
+        Posts::comments::delete::destroy,
+        Posts::comments::edit::edit,
+        Posts::comments::list::list,
         Health::health,
     ),
     components(schemas(

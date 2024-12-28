@@ -1,6 +1,5 @@
 //! All endpoints related to posts.
 
-pub mod comments;
 pub mod create;
 pub mod delete;
 pub mod edit;
@@ -22,22 +21,22 @@ pub use list::list;
 
 pub fn routes() -> Router<PgPool> {
 	Router::new()
-		.route("/create", post(create))
-		.route("/delete/:id", delete(destroy))
-		.route("/edit/:id", patch(edit))
-		.route("/posts", get(list))
-        .nest("/comments", comments::routes())
+		.route("/:id/create", post(create))
+		.route("/:id/delete", delete(destroy))
+		.route("/:id/edit", patch(edit))
+		.route("/comments", get(list))
 }
 
-/// Request body for the create/edit posts endpoint.
+/// Request body for the create/edit comments endpoint.
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 pub struct PostRequest {
 	title: String,
 	body: String,
 }
 
-/// Parameters to identify a post.
+/// Parameters to identify a comment.
 #[derive(Debug, Deserialize, Serialize)]
-pub struct PostParams {
+pub struct CommentParams {
 	post_id: Uuid,
+	comment_id: Uuid,
 }

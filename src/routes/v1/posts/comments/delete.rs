@@ -3,8 +3,8 @@ use axum::response::IntoResponse;
 use crate::{error::HandlerResult, routes::v1::POSTS_TAG};
 
 #[utoipa::path(
-	post,
-	path = "/api/v1/posts/{post_id}/comment",
+	delete,
+	path = "/api/v1/posts/{post_id}/comments/{comment_id}/delete",
 	responses(
         (status = 200, description = "List of comments on the post"),
     ),
@@ -13,6 +13,6 @@ use crate::{error::HandlerResult, routes::v1::POSTS_TAG};
     ),
     tag = POSTS_TAG
 )]
-pub async fn comment() -> HandlerResult<impl IntoResponse> {
+pub async fn destroy() -> HandlerResult<impl IntoResponse> {
 	Ok(())
 }
