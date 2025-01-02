@@ -33,7 +33,7 @@ RUN cargo build --release
 FROM alpine:3.20 AS runtime
 WORKDIR /var/app
 
-COPY --from=builder /build/target/release/backend ./
+COPY --from=builder /build/target/release/lerpz-backend ./
 COPY --from=builder /build/keys ./keys
 COPY --from=builder /build/migrations ./migrations
 
@@ -45,4 +45,4 @@ USER lerpz
 
 EXPOSE 8080
 
-ENTRYPOINT ["/var/app/backend"]
+ENTRYPOINT ["/var/app/lerpz-backend"]
