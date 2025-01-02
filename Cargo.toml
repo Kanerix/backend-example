@@ -49,3 +49,4 @@ codegen-units = 1
 
 [[bin]]
 name = "lerpz-backend"
+path = "src/main.rs"
