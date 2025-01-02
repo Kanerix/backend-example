@@ -71,7 +71,7 @@ where
 {
 	/// Converts a [`HandlerError`] into a [`Response`].
 	///
-	/// This automatically logs errors to using [`tracing`]. This also
+	/// This automatically logs errors using [`tracing`]. This also
 	/// sets the log_id field so that the error can be tracked.
 	fn into_response(mut self) -> Response {
 		if let Some(error) = self.inner.as_ref() {
@@ -195,30 +195,38 @@ where
 mod test {
 	use super::*;
 
-	#[derive(Serialize, Default)]
+	#[derive(Serialize, Clone)]
 	struct Detail {
 		field: String,
 	}
 
 	#[derive(thiserror::Error, Debug)]
 	enum Error {
-		#[error("this is a test error")]
-		RandomError,
+		#[error("this is a random error")]
+		Random,
 	}
 
 	#[test]
 	fn test_internal_server_error() {
+    	let detail = Detail {
+            field: String::from("This is a random error.")
+        };
+
 		let handler_error: HandlerError<Detail> = HandlerError::new(
 			StatusCode::BAD_REQUEST,
 			"Bad Request",
 			"Something went wrong, please contact an developer",
 		)
-		.with_error(Error::RandomError)
-		.with_detail(Detail::default());
+		.with_error(Error::Random)
+		.with_detail(detail.clone());
 
 		assert!(handler_error.inner.is_some());
 		assert!(handler_error.detail.is_some());
 		assert!(handler_error.log_id.is_none()); // `log_id` is set when turned into a response.
+
+		let error_detail = handler_error.detail.as_ref().unwrap();
+
+		assert_eq!(error_detail.field, detail.field);
 
 		let response = handler_error.into_response();
 
