@@ -10,6 +10,7 @@ use super::HEALTH_TAG;
     ),
     tag = HEALTH_TAG
 )]
+#[axum::debug_handler]
 pub async fn health() -> HandlerResult<()> {
 	Ok(())
 }

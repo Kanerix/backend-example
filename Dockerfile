@@ -45,4 +45,4 @@ USER lerpz
 
 EXPOSE 8080
 
-ENTRYPOINT ["RUSTLOG=info", "/var/app/backend"]
+ENTRYPOINT ["/var/app/backend"]

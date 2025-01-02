@@ -19,6 +19,7 @@ use super::PostParams;
     ),
     tag = POSTS_TAG
 )]
+#[axum::debug_handler]
 pub async fn destroy(
 	Path(params): Path<PostParams>,
 	AuthUser(user): AuthUser,

@@ -6,7 +6,6 @@ use axum::{
 	Json,
 };
 use serde::{Deserialize, Serialize};
-use tracing::error;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -89,9 +88,9 @@ where
 			let log_id = log_id.as_ref().unwrap(); // `log_id` is guaranteed to be set (above).
 
 			if self.status_code.is_server_error() {
-				error!(log_id = %log_id, server_error = %error, "An server error occurred");
+    			tracing::error!(log_id = %log_id, server_error = %error, "An server error occurred");
 			} else {
-				error!(log_id = %log_id, client_error = %header, message = %message, "An client error occurred");
+				tracing::error!(log_id = %log_id, client_error = %header, message = %message, "An client error occurred");
 			}
 		}
 
@@ -115,7 +114,7 @@ where
 			message: String::from("If this issue persists, please contact an administrator."),
 			detail: None,
 			inner: Some(value.into()),
-			log_id: None, // This will be set in `into_response()` if `inner` is [`Some`].
+			log_id: None, // This will be set in [`HandlerError::into_response()`] if `inner` is [`Some`].
 		}
 	}
 }
@@ -247,7 +246,7 @@ mod test {
 	#[test]
 	fn test_unsafe_set_log_id() {
 		let example_handler_one = || -> HandlerResult<i32> { Ok("abc".parse::<i32>()?) };
-		let example_handler_two = || -> HandlerResult<f64> { Ok("zyx".parse::<f64>()?) };
+		let example_handler_two = || -> HandlerResult<f64> { Ok("xyz".parse::<f64>()?) };
 		let example_handler_three = || -> HandlerResult<i16> { Ok("qwe".parse::<i16>()?) };
 
 		let handler_error_one = unsafe {
@@ -265,7 +264,6 @@ mod test {
 		assert!(handler_error_one.log_id.is_some());
 		assert!(handler_error_two.log_id.is_some());
 		assert!(handler_error_three.log_id.is_none());
-
 		assert_eq!(handler_error_one.log_id, handler_error_two.log_id)
 	}
 }

@@ -31,6 +31,7 @@ pub struct RegisterRequest {
     ),
     tag = AUTH_TAG
 )]
+#[axum::debug_handler]
 pub async fn register(
 	State(pool): State<PgPool>,
 	Json(payload): Json<RegisterRequest>,

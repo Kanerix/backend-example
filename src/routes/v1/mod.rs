@@ -1,6 +1,9 @@
 mod auth;
-mod health;
 mod posts;
+mod health;
+
+#[cfg(debug_assertions)]
+mod failure;
 
 use auth as Auth;
 use axum::{routing::get, Router};
@@ -16,10 +19,15 @@ const POSTS_TAG: &str = "Post API";
 const HEALTH_TAG: &str = "Health API";
 
 pub fn routes() -> Router<PgPool> {
-	Router::new()
+	let router = Router::new()
 		.route("/health", get(health::health))
 		.nest("/auth", Auth::routes())
-		.nest("/post", Posts::routes())
+		.nest("/post", Posts::routes());
+
+	#[cfg(debug_assertions)]
+	let router = router.route("/failure", get(failure::failure));
+
+	router
 }
 
 #[derive(OpenApi)]

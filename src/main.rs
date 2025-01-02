@@ -7,7 +7,6 @@ use axum::{
 use lerpz_backend::{config::CONFIG, routes};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
-use tracing::info_span;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{SwaggerUi, Url};
@@ -16,13 +15,14 @@ const SWAGGER_UI_PATH: &str = "/swagger-ui";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-	#[cfg(debug_assertions)]
 	if dotenvy::dotenv().is_err() {
 		tracing::warn!("no .env file found");
 	}
 
 	tracing_subscriber::registry()
-		.with(EnvFilter::from_default_env())
+		.with(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+    		EnvFilter::from(format!("info,{}=debug,tower_http::trace=off,info", env!("CARGO_CRATE_NAME")))
+		}))
 		.with(tracing_subscriber::fmt::layer())
 		.init();
 
@@ -52,8 +52,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		)
 		.layer(
 			TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
-				info_span!(
-					"request",
+				tracing::info_span!(
+					"http_request",
 					"type" = "request",
 					method = ?request.method(),
 					uri = request.uri().to_string(),

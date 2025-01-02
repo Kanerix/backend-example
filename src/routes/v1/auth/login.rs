@@ -58,6 +58,7 @@ impl From<&UserWithPassword> for TokenUser {
     ),
     tag = AUTH_TAG
 )]
+#[axum::debug_handler]
 pub async fn login(
 	State(pool): State<PgPool>,
 	Json(payload): Json<LoginRequest>,

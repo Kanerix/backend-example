@@ -19,6 +19,7 @@ use super::TokenResponse;
     ),
     tag = AUTH_TAG
 )]
+#[axum::debug_handler]
 pub async fn refresh(
     jar: CookieJar,
 	State(pool): State<PgPool>,

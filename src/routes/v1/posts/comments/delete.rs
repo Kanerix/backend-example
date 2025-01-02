@@ -13,6 +13,7 @@ use crate::{error::HandlerResult, routes::v1::POSTS_TAG};
     ),
     tag = POSTS_TAG
 )]
+#[axum::debug_handler]
 pub async fn destroy() -> HandlerResult<impl IntoResponse> {
 	Ok(())
 }

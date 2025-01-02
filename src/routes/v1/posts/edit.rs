@@ -16,6 +16,7 @@ use super::{PostParams, PostRequest};
     ),
     tag = POSTS_TAG
 )]
+#[axum::debug_handler]
 pub async fn edit(
     Path(params): Path<PostParams>,
     AuthUser(user): AuthUser,
