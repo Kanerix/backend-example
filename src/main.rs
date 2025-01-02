@@ -15,6 +15,7 @@ const SWAGGER_UI_PATH: &str = "/swagger-ui";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+	#[cfg(debug_assertions)]
 	if dotenvy::dotenv().is_err() {
 		tracing::warn!("no .env file found");
 	}
