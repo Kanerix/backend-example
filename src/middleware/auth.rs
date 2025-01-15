@@ -1,5 +1,4 @@
 use axum::{
-	async_trait,
 	extract::FromRequestParts,
 	http::{header, request::Parts},
 };
@@ -12,7 +11,6 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct AuthUser(pub TokenUser);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for AuthUser
 where
 	S: Send + Sync,

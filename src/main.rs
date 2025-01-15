@@ -22,7 +22,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	tracing_subscriber::registry()
 		.with(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-    		EnvFilter::from(format!("info,{}=debug,tower_http::trace=off,info", env!("CARGO_CRATE_NAME")))
+			EnvFilter::from(format!(
+				"info,{}=debug,tower_http::trace=off,info",
+				env!("CARGO_CRATE_NAME")
+			))
 		}))
 		.with(tracing_subscriber::fmt::layer())
 		.init();
@@ -55,7 +58,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 			TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
 				tracing::info_span!(
 					"http_request",
-					"type" = "request",
 					method = ?request.method(),
 					uri = request.uri().to_string(),
 				)

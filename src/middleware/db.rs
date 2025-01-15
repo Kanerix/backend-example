@@ -1,5 +1,4 @@
 use axum::{
-	async_trait,
 	extract::{FromRef, FromRequestParts},
 	http::request::Parts,
 };
@@ -13,7 +12,6 @@ use crate::error::HandlerError;
 /// We force the connection type to be a Postgres connection here.
 pub struct DbConn(pub PoolConnection<Postgres>);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for DbConn
 where
 	PgPool: FromRef<S>,
