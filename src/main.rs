@@ -1,17 +1,11 @@
-use std::{net::Ipv4Addr, time::Duration};
+use std::{net::Ipv4Addr, sync::Arc, time::Duration};
 
-use aide::{
-	axum::ApiRouter,
-	openapi::{Info, OpenApi},
-};
+use aide::{axum::ApiRouter, openapi::OpenApi};
 use axum::{
 	http::{Method, Request},
 	Extension,
 };
-use lerpz_backend::{
-	config::CONFIG,
-	routes::{self},
-};
+use lerpz_backend::{config::CONFIG, docs::api_docs, routes};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
@@ -45,9 +39,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.await
 		.unwrap_or_else(|err| panic!("migrations failed against database: {err}"));
 
+	let mut api = OpenApi::default();
+
 	let app = ApiRouter::new()
-		.nest("/api/v1", routes::v1::routes())
-		.with_state(pool)
+		.nest_api_service("/api/v1", routes::v1::routes(pool.clone()))
+		.finish_api_with(&mut api, api_docs)
+		.layer(Extension(Arc::new(api)))
 		.layer(
 			CorsLayer::new()
 				.allow_origin(CONFIG.API_ORIGIN.clone())
@@ -61,24 +58,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 					uri = request.uri().to_string(),
 				)
 			}),
-		);
-
-	let mut api = OpenApi {
-		info: Info {
-			description: Some("an example API".to_string()),
-			..Info::default()
-		},
-		..OpenApi::default()
-	};
+		)
+		.with_state(pool);
 
 	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
 	let listener = tokio::net::TcpListener::bind(addr).await?;
 	tracing::info!("server started listening on {addr}");
 
-	let service = app
-		.finish_api(&mut api)
-		.layer(Extension(api))
-		.into_make_service();
+	let service = app.into_make_service();
 
 	axum::serve(listener, service)
 		.with_graceful_shutdown(shutdown_signal())

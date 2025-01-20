@@ -1,4 +1,4 @@
-use aide::axum::IntoApiResponse;
+use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::State, http::StatusCode, Json};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -19,7 +19,7 @@ pub struct RegisterRequest {
 }
 
 #[axum::debug_handler]
-pub async fn register(
+pub async fn handler(
 	State(pool): State<PgPool>,
 	Json(payload): Json<RegisterRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
@@ -69,4 +69,8 @@ pub async fn register(
 	tx.commit().await?;
 
 	Ok(())
+}
+
+pub fn docs(op: TransformOperation) -> TransformOperation {
+	op.description("Register an account.").tag("auth")
 }

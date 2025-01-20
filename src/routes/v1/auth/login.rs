@@ -1,4 +1,4 @@
-use aide::axum::IntoApiResponse;
+use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::State, Json};
 use axum_extra::extract::{cookie::Cookie, CookieJar};
 use chrono::{DateTime, Utc};
@@ -46,7 +46,7 @@ impl From<&UserWithPassword> for TokenUser {
 }
 
 #[axum::debug_handler]
-pub async fn login(
+pub async fn handler(
 	State(pool): State<PgPool>,
 	Json(payload): Json<LoginRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
@@ -99,4 +99,8 @@ pub async fn login(
 			token: access_token,
 		}),
 	))
+}
+
+pub fn docs(op: TransformOperation) -> TransformOperation {
+	op.description("Login to your account.").tag("auth")
 }

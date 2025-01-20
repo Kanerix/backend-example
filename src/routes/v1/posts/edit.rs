@@ -1,4 +1,4 @@
-use aide::axum::IntoApiResponse;
+use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{
 	extract::{Path, State},
 	Json,
@@ -10,7 +10,7 @@ use crate::{error::HandlerResult, middleware::AuthUser};
 use super::{PostParams, PostRequest};
 
 #[axum::debug_handler]
-pub async fn edit(
+pub async fn handler(
 	Path(params): Path<PostParams>,
 	AuthUser(user): AuthUser,
 	State(pool): State<PgPool>,
@@ -30,4 +30,8 @@ pub async fn edit(
 	.await?;
 
 	Ok(())
+}
+
+pub fn docs(op: TransformOperation) -> TransformOperation {
+	op.description("Edit a post.").tag("posts")
 }

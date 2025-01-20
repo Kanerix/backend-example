@@ -1,4 +1,4 @@
-use aide::axum::IntoApiResponse;
+use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::State, Json};
 use sqlx::PgPool;
 
@@ -7,8 +7,8 @@ use crate::{error::HandlerResult, middleware::AuthUser};
 use super::PostRequest;
 
 #[axum::debug_handler]
-pub async fn create(
-    AuthUser(user): AuthUser,
+pub async fn handler(
+	AuthUser(user): AuthUser,
 	State(pool): State<PgPool>,
 	Json(post): Json<PostRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
@@ -24,4 +24,8 @@ pub async fn create(
 	.await?;
 
 	Ok(())
+}
+
+pub fn docs(op: TransformOperation) -> TransformOperation {
+	op.description("Create a post.").tag("posts")
 }

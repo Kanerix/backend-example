@@ -1,4 +1,4 @@
-use aide::axum::IntoApiResponse;
+use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::State, Json};
 use axum_extra::extract::CookieJar;
 use sqlx::PgPool;
@@ -12,7 +12,7 @@ use crate::{
 use super::TokenResponse;
 
 #[axum::debug_handler]
-pub async fn refresh(
+pub async fn handler(
 	jar: CookieJar,
 	State(pool): State<PgPool>,
 ) -> HandlerResult<impl IntoApiResponse> {
@@ -47,4 +47,8 @@ pub async fn refresh(
 		kind: "Bearer".into(),
 		token: access_token,
 	}))
+}
+
+pub fn docs(op: TransformOperation) -> TransformOperation {
+	op.description("Refresh you access token.").tag("auth")
 }

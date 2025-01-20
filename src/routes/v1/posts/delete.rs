@@ -1,4 +1,4 @@
-use aide::axum::IntoApiResponse;
+use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::extract::{Path, State};
 use sqlx::PgPool;
 
@@ -7,7 +7,7 @@ use crate::{error::HandlerResult, middleware::AuthUser};
 use super::PostParams;
 
 #[axum::debug_handler]
-pub async fn destroy(
+pub async fn handler(
 	Path(params): Path<PostParams>,
 	AuthUser(user): AuthUser,
 	State(pool): State<PgPool>,
@@ -22,4 +22,8 @@ pub async fn destroy(
 	.await?;
 
 	Ok(())
+}
+
+pub fn docs(op: TransformOperation) -> TransformOperation {
+	op.description("Delete a post.").tag("posts")
 }

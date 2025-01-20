@@ -1,8 +1,12 @@
-use aide::axum::IntoApiResponse;
+use aide::{axum::IntoApiResponse, transform::TransformOperation};
 
 use crate::error::HandlerResult;
 
 #[axum::debug_handler]
-pub async fn list() -> HandlerResult<impl IntoApiResponse> {
+pub async fn handler() -> HandlerResult<impl IntoApiResponse> {
 	Ok(())
+}
+
+pub fn docs(op: TransformOperation) -> TransformOperation {
+	op.description("List comments.").tag("posts")
 }

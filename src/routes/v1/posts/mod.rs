@@ -7,7 +7,7 @@ pub mod edit;
 pub mod list;
 
 use aide::axum::{
-	routing::{delete, get, post, put},
+	routing::{get_with, post_with, put_with},
 	ApiRouter,
 };
 use schemars::JsonSchema;
@@ -15,18 +15,16 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-pub use create::create;
-pub use delete::destroy;
-pub use edit::edit;
-pub use list::list;
-
-pub fn routes() -> ApiRouter<PgPool> {
+pub fn routes(state: PgPool) -> ApiRouter {
 	ApiRouter::new()
-		.api_route("/create", post(create))
-		.api_route("/delete/{id}", delete(destroy))
-		.api_route("/edit/{id}", put(edit))
-		.api_route("/posts", get(list))
-		.nest("/comments", comments::routes())
+		.api_route("/", get_with(list::handler, list::docs))
+		.api_route("/create", post_with(create::handler, create::docs))
+		.api_route(
+			"/{post_id}",
+			put_with(edit::handler, edit::docs).delete_with(delete::handler, delete::docs),
+		)
+		.nest_api_service("/comments/{post_id}", comments::routes(state.clone()))
+		.with_state(state)
 }
 
 /// Request body for the create/edit posts endpoint.
