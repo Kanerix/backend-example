@@ -1,14 +1,17 @@
+use aide::OperationInput;
 use axum::{
 	extract::FromRequestParts,
 	http::{header, request::Parts},
 };
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 use crate::{
 	error::HandlerError,
 	utils::token::{decode_access_token, TokenUser},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct AuthUser(pub TokenUser);
 
 impl<S> FromRequestParts<S> for AuthUser
@@ -30,3 +33,5 @@ where
 		Ok(AuthUser(token_data.claims.user))
 	}
 }
+
+impl OperationInput for AuthUser {}

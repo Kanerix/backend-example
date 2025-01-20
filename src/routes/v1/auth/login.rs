@@ -1,15 +1,15 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use aide::axum::IntoApiResponse;
+use axum::{extract::State, Json};
 use axum_extra::extract::{cookie::Cookie, CookieJar};
 use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
-	routes::v1::AUTH_TAG,
 	utils::{
 		pwd::validate_pwd,
 		token::{generate_access_token, generate_refresh_token, TokenUser},
@@ -18,7 +18,7 @@ use crate::{
 
 use super::TokenResponse;
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct LoginRequest {
 	username: String,
 	password: String,
@@ -45,24 +45,11 @@ impl From<&UserWithPassword> for TokenUser {
 	}
 }
 
-#[utoipa::path(
-    post,
-    path = "/api/v1/auth/login",
-    request_body(
-        content = LoginRequest,
-        description = "An object containing the username and password of the user.",
-        content_type = "application/json"
-    ),
-    responses(
-        (status = 200, description = "Successful login", body = TokenResponse),
-    ),
-    tag = AUTH_TAG
-)]
 #[axum::debug_handler]
 pub async fn login(
 	State(pool): State<PgPool>,
 	Json(payload): Json<LoginRequest>,
-) -> HandlerResult<impl IntoResponse> {
+) -> HandlerResult<impl IntoApiResponse> {
 	let user = sqlx::query_as!(
 		UserWithPassword,
 		"SELECT

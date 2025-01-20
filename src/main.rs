@@ -1,17 +1,20 @@
 use std::{net::Ipv4Addr, time::Duration};
 
+use aide::{
+	axum::ApiRouter,
+	openapi::{Info, OpenApi},
+};
 use axum::{
 	http::{Method, Request},
-	Router,
+	Extension,
 };
-use lerpz_backend::{config::CONFIG, routes};
+use lerpz_backend::{
+	config::CONFIG,
+	routes::{self},
+};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
-use utoipa::OpenApi;
-use utoipa_swagger_ui::{SwaggerUi, Url};
-
-const SWAGGER_UI_PATH: &str = "/swagger-ui";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -42,12 +45,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.await
 		.unwrap_or_else(|err| panic!("migrations failed against database: {err}"));
 
-	let app = Router::new()
+	let app = ApiRouter::new()
 		.nest("/api/v1", routes::v1::routes())
-		.merge(SwaggerUi::new(SWAGGER_UI_PATH).urls(vec![(
-			Url::with_primary("v1", "/api-docs/openapi_v1.json", true),
-			routes::v1::ApiDoc::openapi(),
-		)]))
 		.with_state(pool)
 		.layer(
 			CorsLayer::new()
@@ -64,11 +63,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 			}),
 		);
 
+	let mut api = OpenApi {
+		info: Info {
+			description: Some("an example API".to_string()),
+			..Info::default()
+		},
+		..OpenApi::default()
+	};
+
 	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
 	let listener = tokio::net::TcpListener::bind(addr).await?;
 	tracing::info!("server started listening on {addr}");
 
-	axum::serve(listener, app.into_make_service())
+	let service = app
+		.finish_api(&mut api)
+		.layer(Extension(api))
+		.into_make_service();
+
+	axum::serve(listener, service)
 		.with_graceful_shutdown(shutdown_signal())
 		.await?;
 

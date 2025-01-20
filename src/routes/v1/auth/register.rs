@@ -1,41 +1,28 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use aide::axum::IntoApiResponse;
+use axum::{extract::State, http::StatusCode, Json};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
-	routes::v1::AUTH_TAG,
 	utils::pwd::hash_pwd,
 };
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RegisterRequest {
 	email: String,
 	username: String,
 	password: String,
 }
 
-#[utoipa::path(
-    post,
-    path = "/api/v1/auth/register",
-    request_body(
-        content = RegisterRequest,
-        description = "An object containing the register payload.",
-        content_type = "application/json"
-    ),
-    responses(
-        (status = 200, description = "Account created", body = String),
-    ),
-    tag = AUTH_TAG
-)]
 #[axum::debug_handler]
 pub async fn register(
 	State(pool): State<PgPool>,
 	Json(payload): Json<RegisterRequest>,
-) -> HandlerResult<impl IntoResponse> {
+) -> HandlerResult<impl IntoApiResponse> {
 	let salt = Uuid::new_v4().to_string();
 	let password = payload.password;
 	let hash = hash_pwd(&password, &salt).await?;

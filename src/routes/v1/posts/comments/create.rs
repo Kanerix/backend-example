@@ -1,19 +1,8 @@
-use axum::response::IntoResponse;
+use aide::axum::IntoApiResponse;
 
-use crate::{error::HandlerResult, routes::v1::POSTS_TAG};
+use crate::error::HandlerResult;
 
-#[utoipa::path(
-	post,
-	path = "/api/v1/posts/{post_id}/comments/{comment_id}/delete",
-	responses(
-        (status = 200, description = "List of comments on the post"),
-    ),
-    params(
-        ("post_id" = Uuid, Path, description = "The UUID of the post")
-    ),
-    tag = POSTS_TAG
-)]
 #[axum::debug_handler]
-pub async fn create() -> HandlerResult<impl IntoResponse> {
+pub async fn create() -> HandlerResult<impl IntoApiResponse> {
 	Ok(())
 }

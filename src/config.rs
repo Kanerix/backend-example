@@ -8,7 +8,7 @@ use crate::utils::env::{self, get_env, get_env_parse};
 
 /// The config generated from environment variables.
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
-    Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {err}"))
+	Config::from_env().unwrap_or_else(|err| panic!("couldn't load environment: {err}"))
 });
 
 /// A macro that generates a configuration struct.

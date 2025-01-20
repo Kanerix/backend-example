@@ -1,29 +1,21 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use aide::axum::IntoApiResponse;
+use axum::{extract::State, Json};
 use axum_extra::extract::CookieJar;
 use sqlx::PgPool;
 
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
-	routes::v1::AUTH_TAG,
 	utils::token::generate_access_token,
 };
 
 use super::TokenResponse;
 
-#[utoipa::path(
-	get,
-	path = "/api/v1/auth/refresh",
-	responses(
-        (status = 200, description = "Successful refresh", body = TokenResponse),
-    ),
-    tag = AUTH_TAG
-)]
 #[axum::debug_handler]
 pub async fn refresh(
-    jar: CookieJar,
+	jar: CookieJar,
 	State(pool): State<PgPool>,
-) -> HandlerResult<impl IntoResponse> {
+) -> HandlerResult<impl IntoApiResponse> {
 	let refresh_cookie = jar
 		.get("refresh_token")
 		.ok_or(HandlerError::unauthorized())?;

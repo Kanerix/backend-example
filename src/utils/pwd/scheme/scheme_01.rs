@@ -43,6 +43,8 @@ impl Scheme for Scheme01 {
 
 		let pwd_ref_bytes = pwd_ref.as_bytes();
 
-		Ok(ARGON2.verify_password(pwd_ref_bytes, &pwd_hash_parsed).is_ok())
+		Ok(ARGON2
+			.verify_password(pwd_ref_bytes, &pwd_hash_parsed)
+			.is_ok())
 	}
 }

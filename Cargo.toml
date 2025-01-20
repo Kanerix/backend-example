@@ -9,8 +9,8 @@ axum = { version = "0.8", features = ["macros", "tokio", "json", "ws", "tracing"
 axum-extra = { version = "0.10", features = ["cookie"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["full"] }
-utoipa = { version = "5.3", features = ["uuid", "chrono"] }
-utoipa-swagger-ui = { version = "8.1", features = ["axum", "reqwest"] }
+aide = { version = "0.14.0", features = ["swagger", "macros", "axum-json", "axum-extra-cookie"] }
+schemars = { version = "0.8", features = ["uuid1", "chrono"] }
 # -- Async
 tokio = { version = "1.41", features = ["full"] }
 futures-util = "0.3"

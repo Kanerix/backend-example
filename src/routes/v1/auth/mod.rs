@@ -4,24 +4,24 @@ pub mod login;
 pub mod refresh;
 pub mod register;
 
-use axum::{routing::post, Router};
+use aide::axum::{routing::post, ApiRouter};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use utoipa::ToSchema;
 
-pub use login::{login, LoginRequest};
+pub use login::login;
 pub use refresh::refresh;
-pub use register::{register, RegisterRequest};
+pub use register::register;
 
-pub fn routes() -> Router<PgPool> {
-	Router::new()
-		.route("/login", post(login))
-		.route("/refresh", post(refresh))
-		.route("/register", post(register))
+pub fn routes() -> ApiRouter<PgPool> {
+	ApiRouter::new()
+		.api_route("/login", post(login))
+		.api_route("/refresh", post(refresh))
+		.api_route("/register", post(register))
 }
 
 /// Response object for endpoints that return a token.
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TokenResponse {
 	pub kind: String,
 	pub token: String,

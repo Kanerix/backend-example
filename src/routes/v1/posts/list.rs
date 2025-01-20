@@ -1,16 +1,8 @@
-use axum::response::IntoResponse;
+use aide::axum::IntoApiResponse;
 
-use crate::{error::HandlerResult, routes::v1::POSTS_TAG};
+use crate::error::HandlerResult;
 
-#[utoipa::path(
-	get,
-	path = "/api/v1/posts",
-	responses(
-        (status = 200, description = "List of posts"),
-    ),
-    tag = POSTS_TAG
-)]
 #[axum::debug_handler]
-pub async fn list() -> HandlerResult<impl IntoResponse> {
+pub async fn list() -> HandlerResult<impl IntoApiResponse> {
 	Ok(())
 }

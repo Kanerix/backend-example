@@ -1,5 +1,6 @@
 use crate::models::user::{User, UserRole};
 use chrono::Utc;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -26,7 +27,7 @@ pub struct TokenClaims {
 }
 
 /// The user field in the claims.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, JsonSchema)]
 pub struct TokenUser {
 	pub id: Uuid,
 	pub username: String,

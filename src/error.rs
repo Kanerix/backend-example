@@ -1,12 +1,13 @@
 //! Error module for endpoint handlers.
 
+use aide::OperationOutput;
 use axum::{
 	http::StatusCode,
 	response::{IntoResponse, Response},
 	Json,
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 use uuid::Uuid;
 
 /// A type alias for [`Result<T, HandlerError>`].
@@ -15,7 +16,7 @@ use uuid::Uuid;
 pub type HandlerResult<T, D = ()> = std::result::Result<T, HandlerError<D>>;
 
 /// Represents an error returned by a handler.
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, Debug, JsonSchema)]
 pub struct HandlerError<D = ()>
 where
 	D: Serialize + Send + Sync,
@@ -88,7 +89,7 @@ where
 			let log_id = log_id.as_ref().unwrap(); // `log_id` is guaranteed to be set (above).
 
 			if self.status_code.is_server_error() {
-    			tracing::error!(log_id = %log_id, server_error = %error, "An server error occurred");
+				tracing::error!(log_id = %log_id, server_error = %error, "An server error occurred");
 			} else {
 				tracing::error!(log_id = %log_id, client_error = %header, message = %message, "An client error occurred");
 			}
@@ -96,6 +97,13 @@ where
 
 		(self.status_code, Json(self)).into_response()
 	}
+}
+
+impl<D> OperationOutput for HandlerError<D>
+where
+	D: Serialize + Send + Sync,
+{
+	type Inner = D;
 }
 
 impl<E, D> From<E> for HandlerError<D>
@@ -207,9 +215,9 @@ mod test {
 
 	#[test]
 	fn test_internal_server_error() {
-    	let detail = Detail {
-            field: String::from("This is a random error.")
-        };
+		let detail = Detail {
+			field: String::from("This is a random error."),
+		};
 
 		let handler_error: HandlerError<Detail> = HandlerError::new(
 			StatusCode::BAD_REQUEST,
