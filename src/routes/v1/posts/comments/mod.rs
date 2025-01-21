@@ -16,12 +16,12 @@ use uuid::Uuid;
 
 pub fn routes(state: PgPool) -> ApiRouter {
 	ApiRouter::new()
-		.api_route("/", post_with(create::handler, create::docs))
+	    .api_route("/", get_with(list::handler, list::docs))
+		.api_route("/create", post_with(create::handler, create::docs))
 		.api_route(
 			"/{comment_id}",
 			put_with(edit::handler, edit::docs).delete_with(delete::handler, delete::docs),
 		)
-		.api_route("/comments", get_with(list::handler, list::docs))
 		.with_state(state)
 }
 

@@ -23,7 +23,7 @@ pub fn routes(state: PgPool) -> ApiRouter {
 			"/{post_id}",
 			put_with(edit::handler, edit::docs).delete_with(delete::handler, delete::docs),
 		)
-		.nest_api_service("/comments/{post_id}", comments::routes(state.clone()))
+		.nest_api_service("/{post_id}/comments", comments::routes(state.clone()))
 		.with_state(state)
 }
 
