@@ -50,5 +50,8 @@ pub async fn handler(
 }
 
 pub fn docs(op: TransformOperation) -> TransformOperation {
-	op.description("Refresh you access token.").tag("auth")
+	op.description("Refresh you access token.")
+		.tag("auth")
+		.response_with::<200, Json<TokenResponse>, _>(|r| r.description("A new access token."))
+		.response_with::<401, Json<TokenResponse>, _>(|r| r.description("Missing refresh token."))
 }
