@@ -1,6 +1,6 @@
-data "azurerm_subscription" "primary" {
-  subscription_id = "5509a305-b67f-4d6c-804e-b38fe72dc105"
-}
+data "azurerm_client_config" "primary" {}
+
+data "azurerm_subscription" "primary" {}
 
 data "github_repository" "primary" {
   full_name = "lerpz-com/${local.repository_name}"
