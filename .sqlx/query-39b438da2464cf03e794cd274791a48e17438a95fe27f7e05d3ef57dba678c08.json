@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO posts (user_id, title, body)\n\t\tVALUES ($1, $2, $3)",
+  "query": "INSERT INTO posts (user_id, title, body) VALUES ($1, $2, $3)",
   "describe": {
     "columns": [],
     "parameters": {
@@ -12,5 +12,5 @@
     },
     "nullable": []
   },
-  "hash": "36e23e3e1290af361c618c4d8d1a57a2d6a94fba7dc557eddddef21e77c23376"
+  "hash": "39b438da2464cf03e794cd274791a48e17438a95fe27f7e05d3ef57dba678c08"
 }

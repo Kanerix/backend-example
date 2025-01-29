@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE posts\n\t\tSET title = $1, body = $2\n\t\tWHERE user_id = $3 AND id = $4",
+  "query": "UPDATE posts SET title = $1, body = $2\n\t\tWHERE user_id = $3 AND id = $4",
   "describe": {
     "columns": [],
     "parameters": {
@@ -13,5 +13,5 @@
     },
     "nullable": []
   },
-  "hash": "a3d16587bb35b271fdbba8734e80724e108b9b6431ad50de90e7a3252e21e9c6"
+  "hash": "ec66539f766742b553d460a4430f953d99a9287ec0b19869106b309e3d5afb3b"
 }
