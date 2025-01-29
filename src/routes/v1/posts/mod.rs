@@ -7,7 +7,7 @@ pub mod edit;
 pub mod list;
 
 use aide::axum::{
-	routing::{get_with, post_with, put_with},
+	routing::{get_with, put_with},
 	ApiRouter,
 };
 use schemars::JsonSchema;
@@ -17,8 +17,10 @@ use uuid::Uuid;
 
 pub fn routes(state: PgPool) -> ApiRouter {
 	ApiRouter::new()
-		.api_route("/", get_with(list::handler, list::docs))
-		.api_route("/create", post_with(create::handler, create::docs))
+		.api_route(
+    		"/",
+            get_with(list::handler, list::docs).post_with(create::handler, create::docs)
+		)
 		.api_route(
 			"/{post_id}",
 			put_with(edit::handler, edit::docs).delete_with(delete::handler, delete::docs),

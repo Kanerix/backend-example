@@ -12,8 +12,7 @@ pub async fn handler(
 	AuthUser(user): AuthUser,
 	State(pool): State<PgPool>,
 ) -> HandlerResult<impl IntoApiResponse> {
-	sqlx::query_as!(
-		models::Post,
+	sqlx::query!(
 		"DELETE FROM posts WHERE user_id = $1 AND id = $2",
 		&user.id,
 		&params.post_id

@@ -16,10 +16,8 @@ pub async fn handler(
 	State(pool): State<PgPool>,
 	Json(post): Json<PostRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
-	sqlx::query_as!(
-		models::Post,
-		"UPDATE posts
-		SET title = $1, body = $2
+	sqlx::query!(
+		"UPDATE posts SET title = $1, body = $2
 		WHERE user_id = $3 AND id = $4",
 		&post.title,
 		&post.body,

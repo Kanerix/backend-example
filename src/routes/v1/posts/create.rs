@@ -12,10 +12,8 @@ pub async fn handler(
 	State(pool): State<PgPool>,
 	Json(post): Json<PostRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
-	sqlx::query_as!(
-		models::Post,
-		"INSERT INTO posts (user_id, title, body)
-		VALUES ($1, $2, $3)",
+	sqlx::query!(
+		"INSERT INTO posts (user_id, title, body) VALUES ($1, $2, $3)",
 		&user.id,
 		&post.title,
 		&post.body,

@@ -6,7 +6,7 @@ pub mod edit;
 pub mod list;
 
 use aide::axum::{
-	routing::{get_with, post_with, put_with},
+	routing::{get_with, put_with},
 	ApiRouter,
 };
 use schemars::JsonSchema;
@@ -16,8 +16,10 @@ use uuid::Uuid;
 
 pub fn routes(state: PgPool) -> ApiRouter {
 	ApiRouter::new()
-	    .api_route("/", get_with(list::handler, list::docs))
-		.api_route("/create", post_with(create::handler, create::docs))
+	    .api_route(
+			"/",
+			get_with(list::handler, list::docs).post_with(create::handler, create::docs)
+		)
 		.api_route(
 			"/{comment_id}",
 			put_with(edit::handler, edit::docs).delete_with(delete::handler, delete::docs),
@@ -27,8 +29,7 @@ pub fn routes(state: PgPool) -> ApiRouter {
 
 /// Request body for the create/edit comments endpoint.
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-pub struct PostRequest {
-	title: String,
+pub struct CommentRequest {
 	body: String,
 }
 
