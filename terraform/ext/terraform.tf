@@ -11,7 +11,6 @@ terraform {
   }
 
   backend "azurerm" {
-    subscription_id      = "5509a305-b67f-4d6c-804e-b38fe72dc105"
     resource_group_name  = "lerpz-backend-ext"
     storage_account_name = "tfstatekvbja"
     container_name       = "tfstate-ext"
