@@ -1,4 +1,6 @@
 //! Error module for endpoint handlers.
+//!
+//! This module will follow the [Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc9457) specification.
 
 use aide::OperationOutput;
 use axum::{
@@ -23,34 +25,31 @@ where
 {
 	/// HTTP status code for the error.
 	#[serde(skip)]
-	status_code: StatusCode,
-	/// The error header.
+	status: StatusCode,
+	/// The error title.
 	///
 	/// Short and precise text that gives an indication
 	/// of what the error is about.
-	header: String,
-	/// The error message.
+	title: String,
+	/// The detailed error message.
 	///
 	/// A more detailed description of what wen't wrong
-	/// or what to do next.
-	message: String,
-	/// Additional details about the error.
+	/// or what the next step is.
+	detail: String,
+	/// The instance of the error.
 	///
 	/// Does not get send to the client if it's [`None`].
-	/// The [`Some`] variant should implement [`ToSchema`] so that
-	/// an OpenAPI schema can be generated for the type.
+	/// This is a unique identifier for the error. This will usually
+	/// be the endpoint that the error occurred in.
 	#[serde(skip_serializing_if = "Option::is_none")]
-	detail: Option<D>,
-	/// The actual error that occurred.
+	instance: Option<String>,
+	/// Additional information about the error.
 	///
-	/// There might no be an actual error, in which case this
-	/// field is [`None`]. Should never be exposed to the client
-	/// for security reasons. This is why we skip Serilization.
-	///
-	/// If this field contains an error, the log_id field should
-	/// also be present, to identify the error in the logs.
-	#[serde(skip)]
-	inner: Option<anyhow::Error>,
+	/// Does not get send to the client if it's [`None`].
+	/// The [`Some`] variant should implement [`Serialize`] so that
+	/// an OpenAPI schema can be generated for the type.
+	#[serde(skip_serializing_if = "Option::is_none", flatten)]
+	extension: Option<D>,
 	/// The log ID of the error.
 	///
 	/// This is automatically set when the response contains an error
@@ -63,68 +62,16 @@ where
 	/// understand how to exploit the application.
 	#[serde(skip_serializing_if = "Option::is_none")]
 	log_id: Option<String>,
-}
-
-impl<D> IntoResponse for HandlerError<D>
-where
-	D: Serialize + Send + Sync,
-{
-	/// Converts a [`HandlerError`] into a [`Response`].
+	/// The actual error that occurred.
 	///
-	/// This automatically logs errors using [`tracing`]. This also
-	/// sets the log_id field so that the error can be tracked.
-	fn into_response(mut self) -> Response {
-		if let Some(error) = self.inner.as_ref() {
-			if self.log_id.is_none() {
-				self.log_id = Some(Uuid::new_v4().into())
-			};
-
-			let HandlerError {
-				ref header,
-				ref message,
-				ref log_id,
-				..
-			} = self;
-
-			let log_id = log_id.as_ref().unwrap(); // `log_id` is guaranteed to be set (above).
-
-			if self.status_code.is_server_error() {
-				tracing::error!(log_id = %log_id, server_error = %error, "An server error occurred");
-			} else {
-				tracing::error!(log_id = %log_id, client_error = %header, message = %message, "An client error occurred");
-			}
-		}
-
-		(self.status_code, Json(self)).into_response()
-	}
-}
-
-impl<D> OperationOutput for HandlerError<D>
-where
-	D: Serialize + Send + Sync,
-{
-	type Inner = D;
-}
-
-impl<E, D> From<E> for HandlerError<D>
-where
-	E: Into<anyhow::Error>,
-	D: Serialize + Send + Sync,
-{
-	/// Turns any error into a [`HandlerError`].
+	/// There might no be an actual error, in which case this
+	/// field is [`None`]. Should never be exposed to the client
+	/// for security reasons. This is why we skip Serilization.
 	///
-	/// This assumes that the error is an internal server error.
-	/// This will also set the error in the `inner` field.
-	fn from(value: E) -> Self {
-		Self {
-			status_code: StatusCode::INTERNAL_SERVER_ERROR,
-			header: String::from("Something went wrong"),
-			message: String::from("If this issue persists, please contact an administrator."),
-			detail: None,
-			inner: Some(value.into()),
-			log_id: None, // This will be set in [`HandlerError::into_response()`] if `inner` is [`Some`].
-		}
-	}
+	/// If this field contains an error, the log_id field should
+	/// also be present, to identify the error in the logs.
+	#[serde(skip)]
+	inner: Option<anyhow::Error>,
 }
 
 impl<D> HandlerError<D>
@@ -141,12 +88,13 @@ where
 		message: impl Into<String>,
 	) -> Self {
 		Self {
-			status_code,
-			header: header.into(),
-			message: message.into(),
-			detail: None,
-			inner: None,
+			status: status_code,
+			title: header.into(),
+			detail: message.into(),
+			instance: None,
+			extension: None,
 			log_id: None,
+			inner: None,
 		}
 	}
 
@@ -163,11 +111,18 @@ where
 	}
 
 	/// Adds a custom detail to the [`HandlerError`].
-	pub fn with_detail<T>(mut self, detail: T) -> Self
+	pub fn with_instance(mut self, instance: impl Into<String>) -> Self
+	{
+		self.instance = Some(instance.into());
+		self
+	}
+
+	/// Adds a custom detail to the [`HandlerError`].
+	pub fn with_extension<T>(mut self, detail: T) -> Self
 	where
 		T: Into<D>,
 	{
-		self.detail = Some(detail.into());
+		self.extension = Some(detail.into());
 		self
 	}
 
@@ -198,12 +153,79 @@ where
 	}
 }
 
+impl<D> IntoResponse for HandlerError<D>
+where
+	D: Serialize + Send + Sync,
+{
+	/// Converts a [`HandlerError`] into a [`Response`].
+	///
+	/// This automatically logs errors using [`tracing`]. This also
+	/// sets the log_id field so that the error can be tracked.
+	fn into_response(mut self) -> Response {
+		if let Some(error) = self.inner.as_ref() {
+			if self.log_id.is_none() {
+				self.log_id = Some(Uuid::new_v4().into())
+			};
+
+			let HandlerError {
+				ref title,
+				ref detail,
+				ref log_id,
+				..
+			} = self;
+
+			let log_id = log_id.as_ref().unwrap(); // `log_id` is guaranteed to be set (above).
+
+			if self.status.is_server_error() {
+				tracing::error!(log_id = %log_id, server_error = %error, "An server error occurred");
+			} else {
+				tracing::error!(log_id = %log_id, client_error = %title, message = %detail, "An client error occurred");
+			}
+		}
+
+		(
+			self.status,
+			[("Content-Type", "application/problem+json")],
+			Json(self),
+		).into_response()
+	}
+}
+
+impl<D> OperationOutput for HandlerError<D>
+where
+	D: Serialize + Send + Sync,
+{
+	type Inner = D;
+}
+
+impl<E, D> From<E> for HandlerError<D>
+where
+	E: Into<anyhow::Error>,
+	D: Serialize + Send + Sync,
+{
+	/// Turns any error into a [`HandlerError`].
+	///
+	/// This assumes that the error is an internal server error.
+	/// This will also set the error in the `inner` field.
+	fn from(value: E) -> Self {
+		Self {
+			status: StatusCode::INTERNAL_SERVER_ERROR,
+			title: String::from("Something went wrong"),
+			detail: String::from("If this issue persists, please contact an administrator."),
+			instance: None,
+			extension: None,
+			log_id: None, // This will be set in [`HandlerError::into_response()`] if `inner` is [`Some`].
+			inner: Some(value.into()),
+		}
+	}
+}
+
 #[cfg(test)]
 mod test {
 	use super::*;
 
 	#[derive(Serialize, Clone)]
-	struct Detail {
+	struct Extension {
 		field: String,
 	}
 
@@ -215,25 +237,25 @@ mod test {
 
 	#[test]
 	fn test_internal_server_error() {
-		let detail = Detail {
+		let extension = Extension {
 			field: String::from("This is a random error."),
 		};
 
-		let handler_error: HandlerError<Detail> = HandlerError::new(
+		let handler_error: HandlerError<Extension> = HandlerError::new(
 			StatusCode::BAD_REQUEST,
 			"Bad Request",
 			"Something went wrong, please contact an developer",
 		)
 		.with_error(Error::Random)
-		.with_detail(detail.clone());
+		.with_extension(extension.clone());
 
 		assert!(handler_error.inner.is_some());
-		assert!(handler_error.detail.is_some());
+		assert!(handler_error.extension.is_some());
 		assert!(handler_error.log_id.is_none()); // `log_id` is set when turned into a response.
 
-		let error_detail = handler_error.detail.as_ref().unwrap();
+		let error_detail = handler_error.extension.as_ref().unwrap();
 
-		assert_eq!(error_detail.field, detail.field);
+		assert_eq!(error_detail.field, extension.field);
 
 		let response = handler_error.into_response();
 
@@ -246,7 +268,7 @@ mod test {
 
 		let handler_error = example_handler().unwrap_err();
 
-		assert!(handler_error.status_code.is_server_error());
+		assert!(handler_error.status.is_server_error());
 		assert!(handler_error.inner.is_some());
 		assert!(handler_error.log_id.is_none()); // `log_id` is set when turned into a response.
 	}
