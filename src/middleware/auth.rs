@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
 	error::HandlerError,
-	utils::token::{decode_access_token, TokenUser},
+	utils::token::{decode_access_token, Error::TokenError, TokenUser},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -29,7 +29,11 @@ where
 			.split_whitespace()
 			.last()
 			.ok_or(HandlerError::unauthorized())?;
-		let token_data = decode_access_token(token).map_err(HandlerError::from)?;
+
+		let token_data = decode_access_token(token).map_err(|err| match err {
+		    TokenError(_) => HandlerError::unauthorized(),
+		})?;
+
 		Ok(AuthUser(token_data.claims.user))
 	}
 }
