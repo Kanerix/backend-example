@@ -12,5 +12,5 @@ pub mod utils;
 
 #[derive(Clone, Debug)]
 pub struct AppState {
-    pub pg: PgPool
+    pub pg: PgPool,
 }

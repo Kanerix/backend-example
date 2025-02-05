@@ -42,7 +42,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 	let mut api = OpenApi::default();
 
 	let state = AppState {
-	   pg: pool.clone()
+		pg: pool.clone()
 	};
 
 	let app = ApiRouter::new()
