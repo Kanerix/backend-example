@@ -1,8 +1,7 @@
 use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::{Path, State}, Json};
-use sqlx::PgPool;
 
-use crate::{error::HandlerResult, middleware::AuthUser, routes::v1::posts::PostParams};
+use crate::{error::HandlerResult, middleware::AuthUser, routes::v1::posts::PostParams, AppState};
 
 use super::CommentRequest;
 
@@ -10,7 +9,7 @@ use super::CommentRequest;
 pub async fn handler(
     Path(params): Path<PostParams>,
     AuthUser(user): AuthUser,
-	State(pool): State<PgPool>,
+	State(state): State<AppState>,
 	Json(comment): Json<CommentRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
     sqlx::query!(
@@ -19,7 +18,7 @@ pub async fn handler(
 		&params.post_id,
 		&comment.body,
 	)
-	.execute(&pool)
+	.execute(&state.pg)
 	.await?;
 
 	Ok(())
