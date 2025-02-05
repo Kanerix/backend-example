@@ -7,9 +7,10 @@ pub mod register;
 use aide::axum::{routing::post_with, ApiRouter};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
-pub fn routes(state: PgPool) -> ApiRouter {
+use crate::AppState;
+
+pub fn routes(state: AppState) -> ApiRouter {
 	ApiRouter::new()
 		.api_route("/login", post_with(login::handler, login::docs))
 		.api_route("/refresh", post_with(refresh::handler, refresh::docs))

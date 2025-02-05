@@ -4,7 +4,6 @@ use axum_extra::extract::{cookie::Cookie, CookieJar};
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
@@ -13,7 +12,7 @@ use crate::{
 	utils::{
 		pwd::validate_pwd,
 		token::{generate_access_token, generate_refresh_token, TokenUser},
-	},
+	}, AppState,
 };
 
 use super::TokenResponse;
@@ -47,7 +46,7 @@ impl From<&UserWithPassword> for TokenUser {
 
 #[axum::debug_handler]
 pub async fn handler(
-	State(pool): State<PgPool>,
+	State(state): State<AppState>,
 	Json(payload): Json<LoginRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
 	let user = sqlx::query_as!(
@@ -65,7 +64,7 @@ pub async fn handler(
         WHERE email = $1",
 		&payload.username,
 	)
-	.fetch_one(&pool)
+	.fetch_one(&state.pg)
 	.await
 	.map_err(|err| match err {
 		sqlx::Error::RowNotFound => HandlerError::unauthorized(),
@@ -84,7 +83,7 @@ pub async fn handler(
 		&user.id,
 		refresh_token
 	)
-	.execute(&pool)
+	.execute(&state.pg)
 	.await?;
 
 	let refresh_cookie = Cookie::build(("refresh_token", refresh_token))

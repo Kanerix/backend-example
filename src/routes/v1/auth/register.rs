@@ -2,13 +2,12 @@ use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::State, http::StatusCode, Json};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
-	utils::pwd::hash_pwd,
+	utils::pwd::hash_pwd, AppState,
 };
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -20,14 +19,14 @@ pub struct RegisterRequest {
 
 #[axum::debug_handler]
 pub async fn handler(
-	State(pool): State<PgPool>,
+	State(state): State<AppState>,
 	Json(payload): Json<RegisterRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
 	let salt = Uuid::new_v4().to_string();
 	let password = payload.password;
 	let hash = hash_pwd(&password, &salt).await?;
 
-	let mut tx = pool.begin().await?;
+	let mut tx = state.pg.begin().await?;
 
 	let user = sqlx::query_as!(
 		models::User,

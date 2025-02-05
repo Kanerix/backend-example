@@ -1,8 +1,7 @@
 use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::extract::{Path, State};
-use sqlx::PgPool;
 
-use crate::{error::HandlerResult, middleware::AuthUser};
+use crate::{error::HandlerResult, middleware::AuthUser, AppState};
 
 use super::PostParams;
 
@@ -10,14 +9,14 @@ use super::PostParams;
 pub async fn handler(
 	Path(params): Path<PostParams>,
 	AuthUser(user): AuthUser,
-	State(pool): State<PgPool>,
+	State(state): State<AppState>,
 ) -> HandlerResult<impl IntoApiResponse> {
 	sqlx::query!(
 		"DELETE FROM posts WHERE user_id = $1 AND id = $2",
 		&user.id,
 		&params.post_id
 	)
-	.execute(&pool)
+	.execute(&state.pg)
 	.await?;
 
 	Ok(())

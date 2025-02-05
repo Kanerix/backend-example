@@ -16,9 +16,9 @@ use aide::swagger::Swagger;
 use axum::Extension;
 use axum::Json;
 
-use sqlx::PgPool;
+use crate::AppState;
 
-pub fn routes(state: PgPool) -> ApiRouter {
+pub fn routes(state: AppState) -> ApiRouter {
 	let router = ApiRouter::new()
 		.route("/swagger", Swagger::new("/api/v1/api.json").axum_route())
 		.route("/api.json", get(serve_api))

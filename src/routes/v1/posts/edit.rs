@@ -3,9 +3,8 @@ use axum::{
 	extract::{Path, State},
 	Json,
 };
-use sqlx::PgPool;
 
-use crate::{error::HandlerResult, middleware::AuthUser};
+use crate::{error::HandlerResult, middleware::AuthUser, AppState};
 
 use super::{PostParams, PostRequest};
 
@@ -13,7 +12,7 @@ use super::{PostParams, PostRequest};
 pub async fn handler(
 	Path(params): Path<PostParams>,
 	AuthUser(user): AuthUser,
-	State(pool): State<PgPool>,
+	State(state): State<AppState>,
 	Json(post): Json<PostRequest>,
 ) -> HandlerResult<impl IntoApiResponse> {
 	sqlx::query!(
@@ -24,7 +23,7 @@ pub async fn handler(
 		&user.id,
 		&params.post_id
 	)
-	.execute(&pool)
+	.execute(&state.pg)
 	.await?;
 
 	Ok(())

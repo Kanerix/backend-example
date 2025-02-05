@@ -5,8 +5,8 @@ use axum::{
 	http::{Method, Request},
 	Extension,
 };
-use lerpz_backend::{config::CONFIG, docs::api_docs, routes};
-use sqlx::postgres::PgPoolOptions;
+use lerpz_backend::{config::CONFIG, docs::api_docs, routes, AppState};
+use sqlx::{postgres::PgPoolOptions, PgPool};
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
@@ -41,6 +41,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	let mut api = OpenApi::default();
 
+	let state = AppState {
+	   pg: pool.clone()
+	};
+
 	let app = ApiRouter::new()
 		.nest_api_service("/api/v1", routes::v1::routes(pool.clone()))
 		.finish_api_with(&mut api, api_docs)
@@ -59,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 				)
 			}),
 		)
-		.with_state(pool);
+		.with_state(state);
 
 	let addr = std::net::SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
 	let listener = tokio::net::TcpListener::bind(addr).await?;

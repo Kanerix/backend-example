@@ -12,10 +12,11 @@ use aide::axum::{
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use uuid::Uuid;
 
-pub fn routes(state: PgPool) -> ApiRouter {
+use crate::AppState;
+
+pub fn routes(state: AppState) -> ApiRouter {
 	ApiRouter::new()
 		.api_route(
     		"/",

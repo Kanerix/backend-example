@@ -1,12 +1,11 @@
 use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::State, Json};
 use axum_extra::extract::CookieJar;
-use sqlx::PgPool;
 
 use crate::{
 	error::{HandlerError, HandlerResult},
 	models,
-	utils::token::generate_access_token,
+	utils::token::generate_access_token, AppState,
 };
 
 use super::TokenResponse;
@@ -14,7 +13,7 @@ use super::TokenResponse;
 #[axum::debug_handler]
 pub async fn handler(
 	jar: CookieJar,
-	State(pool): State<PgPool>,
+	State(state): State<AppState>,
 ) -> HandlerResult<impl IntoApiResponse> {
 	let refresh_cookie = jar
 		.get("refresh_token")
@@ -34,7 +33,7 @@ pub async fn handler(
         WHERE expires_at > NOW() AND token = $1",
 		refresh_token,
 	)
-	.fetch_one(&pool)
+	.fetch_one(&state.pg)
 	.await
 	.map_err(|err| match err {
 		sqlx::Error::RowNotFound => HandlerError::unauthorized(),
