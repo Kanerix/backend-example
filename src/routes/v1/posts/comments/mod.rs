@@ -12,6 +12,7 @@ use aide::axum::{
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::AppState;
 
@@ -29,8 +30,9 @@ pub fn routes(state: AppState) -> ApiRouter {
 }
 
 /// Request body for the create/edit comments endpoint.
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, Validate)]
 pub struct CommentRequest {
+	#[validate(length(min = 3, max = 512))]
 	body: String,
 }
 

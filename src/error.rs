@@ -85,7 +85,7 @@ where
 	pub fn new(
 		status_code: StatusCode,
 		header: impl Into<String>,
-		message: impl Into<String>,
+		message: impl Into<String>
 	) -> Self {
 		Self {
 			status: status_code,

@@ -13,6 +13,7 @@ use aide::axum::{
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::AppState;
 
@@ -31,9 +32,11 @@ pub fn routes(state: AppState) -> ApiRouter {
 }
 
 /// Request body for the create/edit posts endpoint.
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, Validate)]
 pub struct PostRequest {
+	#[validate(length(min = 3, max = 64))]
 	title: String,
+	#[validate(length(min = 3, max = 1024))]
 	body: String,
 }
 

@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::{
 	error::{HandlerError, HandlerResult},
@@ -17,9 +18,11 @@ use crate::{
 
 use super::TokenResponse;
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, Validate)]
 pub struct LoginRequest {
+	#[validate(length(min = 3, max = 32))]
 	username: String,
+	#[validate(length(min = 8, max = 64))]
 	password: String,
 }
 
