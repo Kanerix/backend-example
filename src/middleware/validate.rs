@@ -5,10 +5,10 @@ use validator::{Validate, ValidationErrors};
 
 use crate::error::HandlerError;
 
-/// Wrapper around `axum::extract::Json` that validates the inner value.
+/// Validator that validates the inner value.
 ///
-/// This is using the `validator` crate to validate the inner value.
-/// If this is successful, the inner value is returned as a `ValidatedJson`.
+/// This is using the `validator` crate to validate the
+/// inner value. Used to validate the body of incoming requests.
 pub struct Validated<T>(pub T);
 
 #[derive(Serialize)]
