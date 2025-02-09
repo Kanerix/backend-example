@@ -1,26 +1,31 @@
 use aide::{axum::IntoApiResponse, transform::TransformOperation};
 use axum::{extract::State, http::StatusCode, Json};
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::{
+	middleware::Validated,
 	error::{HandlerError, HandlerResult},
 	models,
 	utils::pwd::hash_pwd, AppState,
 };
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Deserialize, JsonSchema, Validate)]
 pub struct RegisterRequest {
+	#[validate(email)]
 	email: String,
+	#[validate(length(min = 3, max = 32))]
 	username: String,
+	#[validate(length(min = 8, max = 64))]
 	password: String,
 }
 
 #[axum::debug_handler]
 pub async fn handler(
 	State(state): State<AppState>,
-	Json(payload): Json<RegisterRequest>,
+	Validated(Json(payload)): Validated<Json<RegisterRequest>>,
 ) -> HandlerResult<impl IntoApiResponse> {
 	let salt = Uuid::new_v4().to_string();
 	let password = payload.password;

@@ -4,5 +4,7 @@
 pub mod auth;
 /// Database middleware.
 pub mod db;
+/// Validation middleware.
+pub mod validate;
 
-pub use {auth::*, db::*};
+pub use {auth::*, db::*, validate::*};
