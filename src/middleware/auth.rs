@@ -3,15 +3,16 @@ use axum::{
 	extract::FromRequestParts,
 	http::{header, request::Parts},
 };
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 
 use crate::{
 	error::HandlerError,
 	utils::token::{decode_access_token, Error::TokenError, TokenUser},
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+/// An authenticated user.
+///
+/// This will authorize the user based on the provided
+/// token given in the `Authorization` header.
 pub struct AuthUser(pub TokenUser);
 
 impl<S> FromRequestParts<S> for AuthUser
