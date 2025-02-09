@@ -118,11 +118,9 @@ where
 	}
 
 	/// Adds a custom detail to the [`HandlerError`].
-	pub fn with_extension<T>(mut self, detail: T) -> Self
-	where
-		T: Into<D>,
+	pub fn with_extension(mut self, detail: D) -> Self
 	{
-		self.extension = Some(detail.into());
+		self.extension = Some(detail);
 		self
 	}
 
