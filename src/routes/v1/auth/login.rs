@@ -8,12 +8,10 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::{
-	error::{HandlerError, HandlerResult},
-	models,
-	utils::{
+	error::{HandlerError, HandlerResult}, middleware::Validated, models, utils::{
 		pwd::validate_pwd,
 		token::{generate_access_token, generate_refresh_token, TokenUser},
-	}, AppState,
+	}, AppState
 };
 
 use super::TokenResponse;
@@ -50,7 +48,7 @@ impl From<&UserWithPassword> for TokenUser {
 #[axum::debug_handler]
 pub async fn handler(
 	State(state): State<AppState>,
-	Json(payload): Json<LoginRequest>,
+	Validated(Json(payload)): Validated<Json<LoginRequest>>,
 ) -> HandlerResult<impl IntoApiResponse> {
 	let user = sqlx::query_as!(
 		UserWithPassword,

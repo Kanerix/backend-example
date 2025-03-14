@@ -4,6 +4,7 @@ use axum::{
 	http::StatusCode,
 	Form, Json,
 };
+use schemars::JsonSchema;
 use serde::{de::DeserializeOwned, Serialize};
 use validator::{Validate, ValidationErrors};
 
@@ -13,7 +14,13 @@ use crate::error::{HandlerError, HandlerResult};
 ///
 /// This is using the `validator` crate to validate the
 /// inner value. Used to validate the body of incoming requests.
-pub struct Validated<T>(pub T);
+pub struct Validated<T: OperationInput>(pub T);
+
+impl<T: OperationInput> OperationInput for Validated<T> {
+	fn operation_input(ctx: &mut aide::generate::GenContext, operation: &mut aide::openapi::Operation) {
+		T::operation_input(ctx, operation);
+	}
+}
 
 #[derive(Serialize)]
 pub struct ValidationError {
@@ -29,7 +36,7 @@ impl ValidationError {
 impl<S, T> FromRequest<S> for Validated<Json<T>>
 where
 	S: Send + Sync,
-	T: DeserializeOwned + Validate,
+	T: DeserializeOwned + Validate + JsonSchema,
 {
 	type Rejection = HandlerError<ValidationError>;
 
@@ -40,12 +47,10 @@ where
 	}
 }
 
-impl<T> OperationInput for Validated<Json<T>> {}
-
 impl<S, T> FromRequest<S> for Validated<Form<T>>
 where
 	S: Send + Sync,
-	T: DeserializeOwned + Validate,
+	T: DeserializeOwned + Validate + JsonSchema,
 {
 	type Rejection = HandlerError<ValidationError>;
 
@@ -55,8 +60,6 @@ where
 		Ok(Validated(form))
 	}
 }
-
-impl<T> OperationInput for Validated<Form<T>> {}
 
 #[inline]
 fn validate<T: Validate>(data: T) -> HandlerResult<(), ValidationError> {
