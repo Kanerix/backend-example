@@ -8,7 +8,7 @@ pub use error::{Error, Result};
 
 pub use claims::{TokenClaims, TokenUser};
 use jsonwebtoken::{decode, encode, TokenData};
-use rand::{distributions::Alphanumeric, thread_rng, Rng};
+use rand::{distr::Alphanumeric, Rng};
 
 pub fn generate_access_token(user: impl Into<TokenUser>) -> Result<String> {
 	encode(
@@ -32,7 +32,7 @@ pub fn decode_access_token(token: &str) -> Result<TokenData<TokenClaims>> {
 }
 
 pub fn generate_refresh_token() -> String {
-	let rng = thread_rng();
+	let rng = rand::rng();
 	rng.sample_iter(&Alphanumeric)
 		.take(32)
 		.map(char::from)

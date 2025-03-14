@@ -12,7 +12,7 @@ use aide::axum::routing::get_with;
 use aide::axum::ApiRouter;
 use aide::axum::IntoApiResponse;
 use aide::openapi::OpenApi;
-use aide::swagger::Swagger;
+use aide::scalar::Scalar;
 use axum::Extension;
 use axum::Json;
 
@@ -20,7 +20,7 @@ use crate::AppState;
 
 pub fn routes(state: AppState) -> ApiRouter {
 	let router = ApiRouter::new()
-		.route("/swagger", Swagger::new("/api/v1/api.json").axum_route())
+		.route("/docs", Scalar::new("/api/v1/api.json").axum_route())
 		.route("/api.json", get(serve_api))
 		.api_route("/health", get_with(health::handler, health::docs))
 		.nest_api_service("/auth", auth::routes(state.clone()))
