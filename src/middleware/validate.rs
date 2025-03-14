@@ -12,8 +12,8 @@ use crate::error::{HandlerError, HandlerResult};
 
 /// Validator that validates the inner value.
 ///
-/// This is using the `validator` crate to validate the
-/// inner value. Used to validate the body of incoming requests.
+/// This is using the `validator` crate to validate the inner value. Used to
+/// validate the body of incoming requests.
 pub struct Validated<T: OperationInput>(pub T);
 
 impl<T: OperationInput> OperationInput for Validated<T> {
@@ -22,7 +22,11 @@ impl<T: OperationInput> OperationInput for Validated<T> {
 	}
 }
 
-#[derive(Serialize)]
+/// Error response for validation errors.
+/// 
+/// This is the error response that is returned when the validation fails. It
+/// is boxed to avoid large data objects since there can be alot of errors.
+#[derive(Serialize, Debug, Clone)]
 pub struct ValidationError {
 	errors: Box<ValidationErrors>,
 }

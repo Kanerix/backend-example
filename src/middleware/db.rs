@@ -7,7 +7,7 @@ use sqlx::{pool::PoolConnection, PgPool, Postgres};
 use crate::error::HandlerError;
 
 /// A wrapper around a [`PoolConnection`] to make it extractable from requests.
-///
+/// 
 /// This is useful when you want to use a database connection in your handlers.
 /// We force the connection type to be a Postgres connection here.
 pub struct DbConn(pub PoolConnection<Postgres>);

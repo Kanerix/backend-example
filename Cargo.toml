@@ -39,7 +39,7 @@ argon2 = { version = "0.5", features = ["std"] }
 dotenvy = "0.15"
 regex = "1.11"
 uuid = { version = "1.11", features = ["v4", "serde"] }
-validator = { version = "0.19", features = ["derive"] }
+validator = { version = "0.20", features = ["derive"] }
 
 [profile.release]
 lto = true

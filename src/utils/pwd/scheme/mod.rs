@@ -17,9 +17,9 @@ pub trait Scheme {
 }
 
 /// Returns a scheme given a scheme name as a string.
-///
+/// 
 /// # Errors
-///
+/// 
 /// If the scheme given does not exist.
 pub fn get_scheme(scheme_name: &str) -> Result<impl Scheme> {
 	match scheme_name {

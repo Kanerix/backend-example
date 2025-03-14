@@ -28,48 +28,48 @@ where
 	status: StatusCode,
 	/// The error title.
 	///
-	/// Short and precise text that gives an indication
-	/// of what the error is about.
+	/// Short and precise text that gives an indication of what the error is
+	/// about.
 	title: String,
 	/// The detailed error message.
 	///
-	/// A more detailed description of what wen't wrong
-	/// or what the next step is.
+	/// A more detailed description of what wen't wrong or what the next step
+	/// is.
 	detail: String,
 	/// The instance of the error.
 	///
-	/// Does not get send to the client if it's [`None`].
-	/// This is a unique identifier for the error. This will usually
-	/// be the endpoint that the error occurred in.
+	/// Does not get send to the client if it's [`None`]. This is a unique
+	/// identifier for the error. This will usually be the endpoint that the
+	/// error occurred in.
 	#[serde(skip_serializing_if = "Option::is_none")]
 	instance: Option<String>,
 	/// Additional information about the error.
 	///
-	/// Does not get send to the client if it's [`None`].
-	/// The [`Some`] variant should implement [`Serialize`] so that
-	/// an OpenAPI schema can be generated for the type.
+	/// Does not get send to the client if it's [`None`]. The [`Some`] variant
+	/// should implement [`Serialize`] so that an OpenAPI schema can be
+	/// generated for the type.
 	#[serde(skip_serializing_if = "Option::is_none", flatten)]
 	extension: Option<D>,
 	/// The log ID of the error.
 	///
-	/// This is automatically set when the response contains an error
-	/// that should be tracked. This is not public, so that it is never
-	/// set manually, since that might break how you identify the error.
+	/// This is automatically set when the response contains an error that
+	/// should be tracked. This is not public, so that it is never set manually,
+	/// since that might break how you identify the error.
 	///
-	/// This field is sent to the client instead of the acctual error
-	/// that occured. This is way more secure, since the acctual error might
-	/// contain information that should not be leaked and might help attackers
+	/// This field is sent to the client instead of the acctual error that
+	/// occured. This is way more secure, since the acctual error might contain
+	/// information that should not be leaked and might help attackers
 	/// understand how to exploit the application.
 	#[serde(skip_serializing_if = "Option::is_none")]
 	log_id: Option<String>,
 	/// The actual error that occurred.
 	///
-	/// There might no be an actual error, in which case this
-	/// field is [`None`]. Should never be exposed to the client
-	/// for security reasons. This is why we skip Serilization.
+	/// There might no be an actual error, in which case this field is [`None`].
+	/// Should never be exposed to the client for security reasons. This is why
+	/// we skip Serilization.
 	///
-	/// If this field contains an error, the log_id field should
-	/// also be present, to identify the error in the logs.
+	/// If this field contains an error, the log_id field should also be
+	/// present, to identify the error in the logs.
 	#[serde(skip)]
 	inner: Option<anyhow::Error>,
 }
@@ -80,8 +80,8 @@ where
 {
 	/// Create a new [`HandlerError`] with status code, header and message.
 	///
-	/// All optional fields are `None` by default. These can be set using functions
-	/// found on the struct.
+	/// All optional fields are `None` by default. These can be set using
+	/// functions found on the struct.
 	pub fn new(
 		status_code: StatusCode,
 		header: impl Into<String>,
@@ -135,9 +135,10 @@ where
 
 	/// Sets the `log_id` field for the [`HandlerError`].
 	///
-	/// The `log_id` field is automatically set when the `inner` field is present and the
-	/// `log_id` is [`None`]. Changing this field might make it hard or impossible to
-	/// track the error or in other ways, break how the error is logged.
+	/// The `log_id` field is automatically set when the `inner` field is
+	/// present and the `log_id` is [`None`]. Changing this field might make it
+	/// hard or impossible to track the error or in other ways, break how the
+	/// error is logged.
 	///
 	/// # Safety
 	///
@@ -157,8 +158,8 @@ where
 {
 	/// Converts a [`HandlerError`] into a [`Response`].
 	///
-	/// This automatically logs errors using [`tracing`]. This also
-	/// sets the log_id field so that the error can be tracked.
+	/// This automatically logs errors using [`tracing`]. This also sets the
+	/// log_id field so that the error can be tracked.
 	fn into_response(mut self) -> Response {
 		if let Some(error) = self.inner.as_ref() {
 			if self.log_id.is_none() {
@@ -203,8 +204,8 @@ where
 {
 	/// Turns any error into a [`HandlerError`].
 	///
-	/// This assumes that the error is an internal server error.
-	/// This will also set the error in the `inner` field.
+	/// This assumes that the error is an internal server error. This will also
+	/// set the error in the `inner` field.
 	fn from(value: E) -> Self {
 		Self {
 			status: StatusCode::INTERNAL_SERVER_ERROR,

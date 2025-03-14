@@ -10,9 +10,9 @@ use crate::{
 };
 
 /// An authenticated user.
-///
-/// This will authorize the user based on the provided
-/// token given in the `Authorization` header.
+/// 
+/// This will authorize the user based on the provided token given in the
+/// `Authorization` header.
 pub struct AuthUser(pub TokenUser);
 
 impl<S> FromRequestParts<S> for AuthUser

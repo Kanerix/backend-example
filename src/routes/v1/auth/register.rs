@@ -6,10 +6,11 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::{
-	middleware::Validated,
 	error::{HandlerError, HandlerResult},
+	middleware::Validated,
 	models,
-	utils::pwd::hash_pwd, AppState,
+	utils::pwd::{self, hash_pwd},
+	AppState,
 };
 
 #[derive(Debug, Deserialize, JsonSchema, Validate)]
@@ -18,7 +19,10 @@ pub struct RegisterRequest {
 	email: String,
 	#[validate(length(min = 3, max = 32))]
 	username: String,
-	#[validate(length(min = 8, max = 64))]
+	#[validate(
+		length(min = 8, max = 64),
+		regex(path = "pwd::PASSWORD_VALIDATION_REGEX")
+	)]
 	password: String,
 }
 

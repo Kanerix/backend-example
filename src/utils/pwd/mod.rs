@@ -7,14 +7,20 @@ mod parts;
 /// Schemas for hashing and validating passwords.
 mod scheme;
 
-use std::str::FromStr;
+use std::{str::FromStr, sync::LazyLock};
 
 pub use error::{Error, Result};
 pub use parts::{HashParts, PwdParts};
+use regex::Regex;
 pub use scheme::{get_scheme, Scheme};
 
+/// The default validation regex for passwords.
+pub static PASSWORD_VALIDATION_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+	Regex::new(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$").unwrap()
+});
+
 /// The default scheme used for hashing passwords.
-static DEFAULT_SCHEME: &str = "01";
+pub static DEFAULT_SCHEME: &str = "01";
 
 /// Hashes a password using the latest scheme.
 ///
@@ -27,10 +33,9 @@ pub async fn hash_pwd(pwd: impl Into<String>, salt: impl Into<String>) -> Result
 
 /// Hashes a password using custom [`PwdParts`].
 ///
-/// This function can create a password using an old scheme. This is
-/// why it is unsafe to call. You can use this function together with
-/// the [`PwdParts::new`] method to create a password using the latest
-/// scheme.
+/// This function can create a password using an old scheme. This is why it is
+/// unsafe to call. You can use this function together with the
+/// [`PwdParts::new`] method to create a password using the latest scheme.
 ///
 /// # Safety
 ///
@@ -50,8 +55,8 @@ pub async unsafe fn hash_pwd_parts(pwd_parts: PwdParts) -> Result<String> {
 
 /// Validates a hash against a password and salt.
 ///
-/// The hash needs to be parseable to [`HashParts`]. See [`HashParts::from_str`] to see
-/// how the format works.
+/// The hash needs to be parseable to [`HashParts`]. See [`HashParts::from_str`]
+/// to see how the format works.
 pub async fn validate_pwd(
 	pwd_hash: &str,
 	pwd_ref: impl Into<String>,
@@ -63,17 +68,19 @@ pub async fn validate_pwd(
 	unsafe { validate_pwd_parts(pwd_hash, pwd_ref, pwd_salt).await }
 }
 
-/// Validates a password using [`HashParts`] and a password reference with a optional salt.
+/// Validate a password using [`HashParts`] and a password reference.
 ///
-/// This function validates a password hash against a password and optional salt. This uses the
-/// [`HashParts`] to decide wich scheme to use for validating. You can use the [`HashParts::from_str`]
-/// to create the [`HashParts`] needed for validating the password scheme. If you do not use the correct
-/// scheme, this function will error.
-///
+/// This function validates a password hash against a password and optional
+/// salt. This uses the [`HashParts`] to decide wich scheme to use for
+/// validating. You can use the [`HashParts::from_str`] to create the
+/// [`HashParts`] needed for validating the password scheme. If you do not use
+/// the correct scheme, this function will error.
+/// 
 /// # Safety
-///
-/// Make sure you use [`HashParts::from_str`] to get the scheme or be certain that the scheme given is
-/// the same as what was used to create the password hash.
+/// 
+/// Make sure you use [`HashParts::from_str`] to get the scheme or be certain
+/// that the scheme given is the same as what was used to create the password
+/// hash.
 pub async unsafe fn validate_pwd_parts(
 	hash_parts: impl Into<HashParts>,
 	pwd_ref: impl Into<String>,

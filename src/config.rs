@@ -13,9 +13,8 @@ pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
 
 /// A macro that generates a configuration struct.
 ///
-/// The struct will have fields for each of the idents given
-/// in the macro and will have a `from_env` method to load its
-/// fields from environment variables.
+/// The struct will have fields for each of the idents given in the macro and
+/// will have a `from_env` method to load its fields from environment variables.
 macro_rules! generate_config {
 	($($name:ident: $type:ty = $func:tt),+) => {
 		/// Configuration for the application.
@@ -31,8 +30,8 @@ macro_rules! generate_config {
 		impl Config {
 			/// Generates a new [`Config`] from environment variables.
 			///
-			/// Returns an error if any of the environment variables
-			/// are missing or if parsing into its type fails.
+			/// Returns an error if any of the environment variables are missing
+			/// or if parsing into its type fails.
 			#[inline]
 			pub fn from_env() -> env::Result<Config> {
 				Ok(Config {

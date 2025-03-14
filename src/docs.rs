@@ -1,5 +1,5 @@
 use aide::{
-	openapi::{Contact, License, Tag},
+	openapi::{Contact, License, Server, Tag},
 	transform::TransformOpenApi,
 };
 
@@ -8,6 +8,11 @@ pub fn api_docs(api: TransformOpenApi) -> TransformOpenApi {
 		.summary("An example REST application")
 		.description("This API handles different operations for a blog application.")
         .tos("https://lerpz.com/tos")
+		.server(Server {
+			url: "https://lerpz.com/api/v1".into(),
+			description: Some("Production server".into()),
+            ..Default::default()
+		})
         .contact(Contact {
             name: Some("Lerpz Support".into()),
             url: Some("https://support.lerpz.com".into()),

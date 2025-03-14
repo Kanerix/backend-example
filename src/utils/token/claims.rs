@@ -42,8 +42,8 @@ macro_rules! generate_aud {
     ($($name:ident = $val:literal),+) => {
         /// The audience of the token.
         ///
-        /// This this is who/what the token is for. Most often
-        /// the domain of a website or the name of an app.
+        /// This this is who/what the token is for. Most often the domain of a
+        /// website or the name of an app.
         #[allow(clippy::upper_case_acronyms)]
         #[non_exhaustive]
         #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
@@ -63,8 +63,8 @@ macro_rules! generate_iss {
     ($($name:ident = $val:literal),+)=> {
         /// The issuer of the token.
         ///
-        /// This is what service created the token for the user.
-        /// This is most often the domain of the service.
+        /// This is what service created the token for the user. This is most
+        /// often the domain of the service.
         #[allow(clippy::upper_case_acronyms)]
         #[non_exhaustive]
         #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
