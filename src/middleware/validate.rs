@@ -17,12 +17,12 @@ pub struct Validated<T>(pub T);
 
 #[derive(Serialize)]
 pub struct ValidationError {
-	errors: ValidationErrors,
+	errors: Box<ValidationErrors>,
 }
 
 impl ValidationError {
 	pub fn new(errors: ValidationErrors) -> Self {
-		Self { errors }
+		Self { errors: Box::new(errors) }
 	}
 }
 
