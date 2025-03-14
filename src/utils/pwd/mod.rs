@@ -13,14 +13,56 @@ pub use error::{Error, Result};
 pub use parts::{HashParts, PwdParts};
 use regex::Regex;
 pub use scheme::{get_scheme, Scheme};
-
-/// The default validation regex for passwords.
-pub static PASSWORD_VALIDATION_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-	Regex::new(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$").unwrap()
-});
+use validator::ValidationError;
 
 /// The default scheme used for hashing passwords.
 pub static DEFAULT_SCHEME: &str = "01";
+
+/// The default validation regex for passwords.
+static VALIDATE_PWD_REGEX: LazyLock<(Regex, Regex, Regex, Regex)> =
+	LazyLock::new(|| {
+		(
+			Regex::new(r"[a-z]").unwrap(),
+			Regex::new(r"[A-Z]").unwrap(),
+			Regex::new(r"[0-9]").unwrap(),
+			Regex::new(r"[!@#$%&*?]").unwrap(),
+		)
+	});
+
+/// Validates a password against the default requirements.
+/// 
+/// The default requirements are:
+/// - At least one lowercase letter
+/// - At least one uppercase letter
+/// - At least one number
+/// - At least one symbol
+/// 
+/// If the password does not meet these requirements, a validation error is
+/// returned. The error will have the code `requirements` and a list of errors
+/// with the key `errors`.
+pub fn validate_pwd_requirements(pwd: &str) -> std::result::Result<(), validator::ValidationError> {
+	let (lowercase, uppercase, number, symbol) = VALIDATE_PWD_REGEX.clone();
+
+    let requirements = [
+        (lowercase, "missing_lowercase"),
+        (uppercase, "missing_uppercase"),
+        (number, "missing_number"),
+        (symbol, "missing_symbol"),
+    ];
+
+    let errors: Vec<&'static str> = requirements.into_iter()
+        .filter(|(regex, _)| !regex.is_match(pwd))
+        .map(|(_, error_msg)| error_msg)
+        .collect();
+
+	if errors.is_empty() {
+		Ok(())
+	} else {
+		let mut validation_error = ValidationError::new("requirements");
+		validation_error.add_param("errors".into(), &errors);
+		Err(validation_error)
+	}
+}
 
 /// Hashes a password using the latest scheme.
 ///
@@ -75,9 +117,9 @@ pub async fn validate_pwd(
 /// validating. You can use the [`HashParts::from_str`] to create the
 /// [`HashParts`] needed for validating the password scheme. If you do not use
 /// the correct scheme, this function will error.
-/// 
+///
 /// # Safety
-/// 
+///
 /// Make sure you use [`HashParts::from_str`] to get the scheme or be certain
 /// that the scheme given is the same as what was used to create the password
 /// hash.

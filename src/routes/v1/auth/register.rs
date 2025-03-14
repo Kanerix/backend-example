@@ -21,7 +21,7 @@ pub struct RegisterRequest {
 	username: String,
 	#[validate(
 		length(min = 8, max = 64),
-		regex(path = "pwd::PASSWORD_VALIDATION_REGEX")
+		custom(function = "pwd::validate_pwd_requirements", code = "requirements")
 	)]
 	password: String,
 }
