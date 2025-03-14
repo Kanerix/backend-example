@@ -1,5 +1,9 @@
 use aide::OperationInput;
-use axum::{extract::{FromRequest, Request}, http::StatusCode, Form, Json};
+use axum::{
+	extract::{FromRequest, Request},
+	http::StatusCode,
+	Form, Json,
+};
 use serde::{de::DeserializeOwned, Serialize};
 use validator::{Validate, ValidationErrors};
 
@@ -11,18 +15,15 @@ use crate::error::{HandlerError, HandlerResult};
 /// inner value. Used to validate the body of incoming requests.
 pub struct Validated<T>(pub T);
 
-/// A validation error response.
 #[derive(Serialize)]
-pub struct ValidationErrorResponse {
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-	errors: Vec<ValidationErrorResponseItem>,
+pub struct ValidationError {
+	errors: ValidationErrors,
 }
 
-/// A single validation error item.
-#[derive(Serialize)]
-pub struct ValidationErrorResponseItem {
-	field: String,
-	problems: Vec<String>,
+impl ValidationError {
+	pub fn new(errors: ValidationErrors) -> Self {
+		Self { errors }
+	}
 }
 
 impl<S, T> FromRequest<S> for Validated<Json<T>>
@@ -30,7 +31,7 @@ where
 	S: Send + Sync,
 	T: DeserializeOwned + Validate,
 {
-	type Rejection = HandlerError<ValidationErrorResponse>;
+	type Rejection = HandlerError<ValidationError>;
 
 	async fn from_request(req: Request, s: &S) -> Result<Self, Self::Rejection> {
 		let json = Json::<T>::from_request(req, s).await.map_err(unparseable)?;
@@ -46,7 +47,7 @@ where
 	S: Send + Sync,
 	T: DeserializeOwned + Validate,
 {
-	type Rejection = HandlerError<ValidationErrorResponse>;
+	type Rejection = HandlerError<ValidationError>;
 
 	async fn from_request(req: Request, s: &S) -> Result<Self, Self::Rejection> {
 		let form = Form::<T>::from_request(req, s).await.map_err(unparseable)?;
@@ -57,32 +58,23 @@ where
 
 impl<T> OperationInput for Validated<Form<T>> {}
 
-impl From<ValidationErrors> for ValidationErrorResponse {
-	fn from(errors: ValidationErrors) -> Self {
-		let display_errors = Vec::new();
-
-		for (_field, _errors) in errors.field_errors() {
-			todo!()
-		}
-
-		ValidationErrorResponse { errors: display_errors }
-	}
+#[inline]
+fn validate<T: Validate>(data: T) -> HandlerResult<(), ValidationError> {
+	data.validate().map_err(|err| {
+		HandlerError::new(
+			StatusCode::BAD_REQUEST,
+			"Validation failed",
+			"Validation failed for your request body.",
+		)
+		.with_extension(ValidationError::new(err))
+	})
 }
 
 #[inline]
-fn validate<T: Validate>(data: T) -> HandlerResult<(), ValidationErrorResponse> {
-    data.validate().map_err(|err| HandlerError::new(
+fn unparseable<T: std::error::Error>(_: T) -> HandlerError<ValidationError> {
+	HandlerError::new(
 		StatusCode::BAD_REQUEST,
-		"Validation failed",
-		"Was unable to validate you request."
-	).with_extension(ValidationErrorResponse::from(err)))
-}
-
-#[inline]
-fn unparseable<T: std::error::Error>(_: T) -> HandlerError<ValidationErrorResponse> {
-    HandlerError::new(
-        StatusCode::BAD_REQUEST,
-        "Invalid request",
-        "Couldn't parse request body."
-    )
+		"Invalid request",
+		"Couldn't parse request body.",
+	)
 }

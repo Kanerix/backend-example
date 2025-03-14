@@ -33,6 +33,7 @@ macro_rules! generate_config {
 			///
 			/// Returns an error if any of the environment variables
 			/// are missing or if parsing into its type fails.
+			#[inline]
 			pub fn from_env() -> env::Result<Config> {
 				Ok(Config {
                     $(

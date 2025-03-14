@@ -32,7 +32,7 @@ where
 			.ok_or(HandlerError::unauthorized())?;
 
 		let token_data = decode_access_token(token).map_err(|err| match err {
-		    TokenError(_) => HandlerError::unauthorized(),
+			TokenError(_) => HandlerError::unauthorized(),
 		})?;
 
 		Ok(AuthUser(token_data.claims.user))
