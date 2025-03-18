@@ -23,6 +23,8 @@ jobs:
   prepare-pipeline:
     uses: lerpz-com/github-actions/.github/workflows/prepare-pipeline.yml@v1
     secrets: inherit
+    with:
+      rust: true
 
   rust-lint-and-test:
     uses: lerpz-com/github-actions/.github/workflows/rust-lint-and-test.yml@v1
@@ -38,7 +40,7 @@ jobs:
     with:
       build_override: ${{ inputs.build_override || false }}
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
-      package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
+      package_version: ${{ needs.prepare-pipeline.outputs.rust_package_version }}
 
   build-and-push-image:
     uses: lerpz-com/github-actions/.github/workflows/docker-build-and-push.yml@v1
@@ -48,7 +50,7 @@ jobs:
       build_override: ${{ inputs.build_override || false }}
       deploy_env: ${{ needs.prepare-pipeline.outputs.deploy_env }}
       image_name: ${{ needs.prepare-pipeline.outputs.image_name }}
-      package_version: ${{ needs.prepare-pipeline.outputs.package_version }}
+      package_version: ${{ needs.prepare-pipeline.outputs.rust_package_version }}
 
   # https://github.com/lerpz-com/lerpz-backend/issues/7
   # terraform:
