@@ -5,11 +5,23 @@ edition = "2021"
 
 [dependencies]
 # -- Web
-axum = { version = "0.8", features = ["macros", "tokio", "json", "ws", "tracing"] }
+axum = { version = "0.8", features = [
+    "macros",
+    "tokio",
+    "json",
+    "ws",
+    "tracing",
+] }
 axum-extra = { version = "0.10", features = ["cookie"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["full"] }
-aide = { version = "0.14", features = ["scalar", "macros", "axum-json", "axum-form", "axum-extra-cookie"] }
+aide = { version = "0.14", features = [
+    "scalar",
+    "macros",
+    "axum-json",
+    "axum-form",
+    "axum-extra-cookie",
+] }
 schemars = { version = "0.8", features = ["uuid1", "chrono"] }
 # -- Async
 tokio = { version = "1.41", features = ["full"] }
@@ -29,6 +41,8 @@ sqlx = { version = "0.8", features = [
     "macros",
     "uuid",
 ] }
+# -- Azure
+azure_identity = { version = "0.22", features = ["client_certificate"] }
 # -- Other
 anyhow = "1.0"
 thiserror = "2.0"
