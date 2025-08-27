@@ -2,8 +2,7 @@ use std::{net::Ipv4Addr, sync::Arc, time::Duration};
 
 use aide::{axum::ApiRouter, openapi::OpenApi};
 use axum::{
-	http::{Method, Request},
-	Extension,
+	http::{Method, Request}, response::Redirect, Extension
 };
 use lerpz_backend::{config::CONFIG, docs::api_docs, routes, AppState};
 use sqlx::postgres::PgPoolOptions;
@@ -47,6 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	let app = ApiRouter::new()
 		.nest_api_service("/api/v1", routes::v1::routes(state))
+		.fallback(redirect_docs)
 		.finish_api_with(&mut api, api_docs)
 		.layer(Extension(Arc::new(api)))
 		.layer(
@@ -75,6 +75,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.await?;
 
 	Ok(())
+}
+
+async fn redirect_docs() -> Redirect {
+	Redirect::permanent("/api/v1/docs")
 }
 
 async fn shutdown_signal() {
