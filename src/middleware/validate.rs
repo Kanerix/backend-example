@@ -14,26 +14,37 @@ use crate::error::{HandlerError, HandlerResult};
 ///
 /// This is using the `validator` crate to validate the inner value. Used to
 /// validate the body of incoming requests.
-pub struct Validated<T: OperationInput>(pub T);
+pub struct Validated<T>(pub T)
+where
+	T: OperationInput;
 
-impl<T: OperationInput> OperationInput for Validated<T> {
-	fn operation_input(ctx: &mut aide::generate::GenContext, operation: &mut aide::openapi::Operation) {
+impl<T> OperationInput for Validated<T>
+where
+	T: OperationInput,
+{
+	fn operation_input(
+		ctx: &mut aide::generate::GenContext,
+		operation: &mut aide::openapi::Operation,
+	) {
 		T::operation_input(ctx, operation);
 	}
 }
 
 /// Error response for validation errors.
 /// 
-/// This is the error response that is returned when the validation fails. It
-/// is boxed to avoid large data objects since there can be alot of errors.
+/// This is the error response that is returned when the validation fails. It is
+/// boxed to avoid large data objects since there can be alot of errors.
 #[derive(Serialize, Debug, Clone)]
 pub struct ValidationError {
 	errors: Box<ValidationErrors>,
 }
 
 impl ValidationError {
+	/// Create a new `ValidationError`.
 	pub fn new(errors: ValidationErrors) -> Self {
-		Self { errors: Box::new(errors) }
+		Self {
+			errors: Box::new(errors),
+		}
 	}
 }
 

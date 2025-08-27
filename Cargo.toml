@@ -15,14 +15,14 @@ axum = { version = "0.8", features = [
 axum-extra = { version = "0.10", features = ["cookie"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["full"] }
-aide = { version = "0.14", features = [
+aide = { version = "0.15", features = [
     "scalar",
     "macros",
     "axum-json",
     "axum-form",
     "axum-extra-cookie",
 ] }
-schemars = { version = "0.8", features = ["uuid1", "chrono"] }
+schemars = { version = "0.9", features = ["uuid1", "chrono04"] }
 # -- Async
 tokio = { version = "1.41", features = ["full"] }
 futures-util = "0.3"
@@ -42,7 +42,7 @@ sqlx = { version = "0.8", features = [
     "uuid",
 ] }
 # -- Azure
-azure_identity = { version = "0.22", features = ["client_certificate"] }
+azure_identity = { version = "0.27", features = ["client_certificate"] }
 # -- Other
 anyhow = "1.0"
 thiserror = "2.0"
