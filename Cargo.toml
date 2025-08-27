@@ -54,6 +54,7 @@ dotenvy = "0.15"
 regex = "1.11"
 uuid = { version = "1.11", features = ["v4", "serde"] }
 validator = { version = "0.20", features = ["derive"] }
+reqwest = "0.12.23"
 
 [profile.release]
 lto = true
